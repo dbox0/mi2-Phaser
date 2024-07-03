@@ -1,3 +1,5 @@
+
+
 class SceneMain extends Phaser.Scene {
     constructor() {
       super({ key: "SceneMain" });
@@ -11,11 +13,45 @@ class SceneMain extends Phaser.Scene {
       this.load.image("sprSand", "content/sprites/sprSand.png");
       this.load.image("sprGrass", "content/sprites/sprGrass.png");
       this.load.image("ship","content/sprites/shiptest.png");
+      this.load.image("enemy","content/sprites/enemy.png");
+      this.load.image("projectile","content/sprites/projectile.png")
     }
   
     create() {
       
+      this.input.on('pointerdown', function (pointer) {
+        // Get the x and y coordinates of the pointer
+        const screenX = pointer.x;
+        const screenY = pointer.y;
 
+        const playerX = this.ship.x;
+        const playerY = this.ship.y;
+
+        const worldX = playerX + (screenX - this.cameras.main.centerX);
+        const worldY = playerY + (screenY - this.cameras.main.centerY);
+
+        // Log the coordinates to the console
+        console.log('Pointer down at:', worldX, worldY);
+        let dirX = worldX - this.ship.x;
+        let dirY = worldY - this.ship.y;
+        let normalized = Math.sqrt(dirX*dirX + dirY*dirY)
+
+      
+        const a = dirX/normalized
+      
+        const b = dirY/normalized;
+        console.log("B: " + b)
+        var projectile = new Projectile(this,this.ship.x,this.ship.y,"projectile",a,b,100)
+        projectile.setDepth(2);
+      
+        // Optionally, you can do something with these coordinates
+        // For example, create a sprite at the clicked position
+        // this.add.sprite(x, y, 'someSpriteKey');
+    }, this);
+
+
+      this.i = 0;
+      this.j = 0;
       this.currentFrameIndex = 0
       this.anims.create({
         key: "sprWater",
@@ -31,12 +67,27 @@ class SceneMain extends Phaser.Scene {
          // currentFrameIndex = frame.index;
         //}
       });
+      this.projectiles = this.physics.add.group({
+        classType: Projectile,
+        runChildUpdate: true
+    });
+
+
+      this.enemies = this.physics.add.group({
+        classType: Enemy,
+        runChildUpdate: true
+      })
       
+      this.enemyprojectiles = this.physics.add.group({
+        classType: Projectile,
+        runChildUpdate: true
+      })
+
       this.chunkSize = 12;
       this.tileSize = 16;
       this.movSpeed = 2;
   
-      this.cameras.main.setZoom(1.4);
+      this.cameras.main.setZoom(0.8);
       this.followPoint = new Phaser.Math.Vector2(
         this.cameras.main.worldView.x + (this.cameras.main.worldView.width * 0.5),
         this.cameras.main.worldView.y + (this.cameras.main.worldView.height * 0.5)
@@ -52,9 +103,25 @@ class SceneMain extends Phaser.Scene {
 
       this.input.setDefaultCursor('url(content/sprites/crosshair.png), pointer');
 
+      this.physics.add.collider(this.projectiles, this.enemies, this.handleProjectileCollision, null, this);
+
+      // Add collision detection for player projectiles hitting enemy projectiles
+      this.physics.add.collider(this.projectiles, this.enemyProjectiles, this.handleProjectileProjectileCollision, null, this);
+      
+      
+      // Mouse position
+      this.mousePosX = game.input.mousePointer.x;
+      this.mousePosY = game.input.mousePointer.y;
+
       this.ship.setDepth(1);
+      this.enemies.setDepth(1);
+
+      //this.spawnEnemy();
+      
     }
-  
+    
+
+   
     getChunk(x, y) {
       var chunk = null;
       for (var i = 0; i < this.chunks.length; i++) {
@@ -64,9 +131,21 @@ class SceneMain extends Phaser.Scene {
       }
       return chunk;
     }
-  
+
+    spawnEnemy(x,y){
+    var enemy = this.enemies.create(x, y,'ship',this.ship);
+    enemy.setDepth(1);
+      
+      
+    }
+    
+    spawnProjectile(){
+      
+    }
+
     update() {
-  
+      
+     
       var snappedChunkX = (this.chunkSize * this.tileSize) * Math.round(this.ship.x / (this.chunkSize * this.tileSize));
       var snappedChunkY = (this.chunkSize * this.tileSize) * Math.round(this.ship.y / (this.chunkSize * this.tileSize));
   
@@ -78,7 +157,7 @@ class SceneMain extends Phaser.Scene {
           var existingChunk = this.getChunk(x, y);
   
           if (existingChunk == null) {
-            var newChunk = new Chunk(this, x, y,this.currentFrameIndex);
+            var newChunk = new Chunk(this, x, y,this.currentFrameIndex,this.ship);
             this.chunks.push(newChunk);
           }
         }
@@ -94,7 +173,7 @@ class SceneMain extends Phaser.Scene {
           chunk.y
         ) < 3) {
           if (chunk !== null) {
-            chunk.load();
+            chunk.load(this.ship);
           }
         }
         else {
@@ -126,7 +205,8 @@ class SceneMain extends Phaser.Scene {
         this.ship.flipX = false;
       }
 
-      console.log(this.getChunk(this.ship.x,this.ship.y));
+
+      //console.log(this.getChunk(this.ship.x,this.ship.y));
   
       this.cameras.main.centerOn(this.ship.x, this.ship.y);
     }
