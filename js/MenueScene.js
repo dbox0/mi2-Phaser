@@ -11,7 +11,7 @@ class MenueScene extends Phaser.Scene {
     preload() {
         this.load.image('button1', './content/ui/buttonLong_brown.png')
         this.load.image('button1Active', './content/ui/buttonLong_brown_pressed.png')
-        this.load.image('curser-hand', './content/ui/cursorGauntlet_grey.png')
+        this.load.image('cursor', './content/ui/cursorGauntlet_grey.png')
     }
 
     create() {
@@ -20,28 +20,73 @@ class MenueScene extends Phaser.Scene {
         // Play button Erstellen
         const playButton = this.add.image(width * 0.5, height * 0.6, 'button1')
             .setDisplaySize(150, 50)
+            .setInteractive() // Button interaktiv machen
         
         this.add.text(playButton.x, playButton.y, 'Play')
             .setOrigin(0.5)
 
+
+            playButton.on('pointerdown', () => {
+                this.confirmSelection()
+            })
+    
+            playButton.on('pointerover', () => {
+                this.selectButton(this.buttons.indexOf(playButton))
+            })
+    
+            playButton.on('pointerout', () => {
+                this.selectButton(this.selectedButtonIndex)
+            })
+
+
+
         // How2Play button Erstellen
         const How2PlayButton = this.add.image(playButton.x, playButton.y + playButton.displayHeight + 10, 'button1')
             .setDisplaySize(150, 50)
+            .setInteractive()
 
         this.add.text(How2PlayButton.x, How2PlayButton.y, 'How2Play')
             .setOrigin(0.5)
 
-        // Credits button Erstellen 
-        const creditsButton = this.add.image(How2PlayButton.x, How2PlayButton.y + How2PlayButton.displayHeight + 10, 'button1')
-            .setDisplaySize(150, 50)
 
-        this.add.text(creditsButton.x, creditsButton.y, 'Credits')
+            How2PlayButton.on('pointerdown', () => {
+                this.confirmSelection()
+            })
+    
+            How2PlayButton.on('pointerover', () => {
+                this.selectButton(this.buttons.indexOf(How2PlayButton))
+            })
+    
+            How2PlayButton.on('pointerout', () => {
+                this.selectButton(this.selectedButtonIndex)
+            })
+    
+
+        // Credits button Erstellen 
+        const CreditsButton = this.add.image(How2PlayButton.x, How2PlayButton.y + How2PlayButton.displayHeight + 10, 'button1')
+            .setDisplaySize(150, 50)
+            .setInteractive()
+
+        this.add.text(CreditsButton.x, CreditsButton.y, 'Credits')
             .setOrigin(0.5)
+
+            CreditsButton.on('pointerdown', () => {
+                this.confirmSelection()
+            })
+    
+            CreditsButton.on('pointerover', () => {
+                this.selectButton(this.buttons.indexOf(CreditsButton))
+            })
+    
+            CreditsButton.on('pointerout', () => {
+                this.selectButton(this.selectedButtonIndex)
+            })
+            
 
         // Store buttons in an array
         this.buttons.push(playButton)
         this.buttons.push(How2PlayButton)
-        this.buttons.push(creditsButton)
+        this.buttons.push(CreditsButton)
 
         // Initialize button selector
     
@@ -51,6 +96,16 @@ class MenueScene extends Phaser.Scene {
 
         // Set up keyboard input
         this.cursors = this.input.keyboard.createCursorKeys()
+
+
+        this.input.setDefaultCursor('url(content/ui/cursorGauntlet_grey.png), pointer');
+        this.cursor.setScale(0.5); // Größe des Cursors anpassen
+
+        
+
+        this.input.on('pointermove', (pointer) => {
+            this.cursor.setPosition(pointer.x, pointer.y)
+        })
     }
 
     update() {
