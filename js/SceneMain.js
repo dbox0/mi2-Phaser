@@ -15,6 +15,7 @@ class SceneMain extends Phaser.Scene {
   
     create() {
       
+      //
 
       this.currentFrameIndex = 0
       this.anims.create({
