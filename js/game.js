@@ -1,3 +1,5 @@
+
+
 var config = {
     type: Phaser.WEBGL,
     width: 640,
@@ -10,7 +12,10 @@ var config = {
       }
     },
     scene: [
-      SceneMain
+      MenueScene,
+      SceneMain,
+      HowToPlay,
+
     ],
     pixelArt: true,
     roundPixels: true
