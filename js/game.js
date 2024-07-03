@@ -12,10 +12,13 @@ var config = {
       }
     },
     scene: [
-      SceneMain
+      MenueScene,
+      SceneMain,
+      HowToPlay,
+
     ],
     pixelArt: true,
     roundPixels: true
-  };
+  };//
   
   var game = new Phaser.Game(config);
