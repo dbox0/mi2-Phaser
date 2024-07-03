@@ -4,7 +4,7 @@ class HowToPlay extends Phaser.Scene {
     constructor() {
         super({ key: "HowToPlayScene" })
         this.buttons = [];
-        this.buttonLabels = ['Back'];
+        this.buttonLabels = ['MenueScene'];
         this.selectedButtonIndex = 0;
     }
 
@@ -57,17 +57,17 @@ class HowToPlay extends Phaser.Scene {
 
 
         // Store buttons in an array
-        this.buttons.push(BackButton)
+        this.buttons.push(backButton)
 
         this.selectButton(0)
 
         this.cursors = this.input.keyboard.createCursorKeys()
 
         this.input.setDefaultCursor('url(content/ui/cursorGauntlet_grey.png), pointer');
-        this.cursor.setScale(0.5); // Größe des Cursors anpassen
+        //this.cursor.setScale(0.5); // Größe des Cursors anpassen
 
         this.input.on('pointermove', (pointer) => {
-            this.cursor.setPosition(pointer.x, pointer.y)
+           // this.cursor.setPosition(pointer.x, pointer.y)
         })
     }
 
@@ -105,10 +105,23 @@ class HowToPlay extends Phaser.Scene {
     }
 
 
+    selectNextButton(change = 1) {
+        let index = this.selectedButtonIndex + change
+
+        if (index >= this.buttons.length) {
+            index = 0
+        } else if (index < 0) {
+            index = this.buttons.length - 1
+        }
+
+        this.selectButton(index)
+    }
+
+
     confirmSelection() {
         const selectedLabel = this.buttonLabels[this.selectedButtonIndex]
         switch (selectedLabel) {
-            case 'Back':
+            case 'MenueScene':
                 this.scene.start('MenueScene') 
                 break;
             default:

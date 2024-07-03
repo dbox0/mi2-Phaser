@@ -15,6 +15,7 @@ class MenueScene extends Phaser.Scene {
     }
 
     create() {
+        console.log("Entered Main Menu")
         const { width, height } = this.scale
 
         // Play button Erstellen
@@ -99,13 +100,13 @@ class MenueScene extends Phaser.Scene {
 
 
         this.input.setDefaultCursor('url(content/ui/cursorGauntlet_grey.png), pointer');
-        this.cursor.setScale(0.5); // Größe des Cursors anpassen
+        //this.cursor.setScale(0.5); // Größe des Cursors anpassen
 
         
-
+            /*
         this.input.on('pointermove', (pointer) => {
-            this.cursor.setPosition(pointer.x, pointer.y)
-        })
+            this.cursors.setPosition(pointer.x, pointer.y)
+        })*/
     }
 
     update() {
