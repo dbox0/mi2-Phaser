@@ -44,7 +44,7 @@ class MenueScene extends Phaser.Scene {
         this.buttons.push(creditsButton)
 
         // Initialize button selector
-        this.buttonSelector = this.add.image(0.5, 0.5, 'cursor-hand')
+    
 
         // Select the initial button
         this.selectButton(0)
@@ -79,8 +79,6 @@ class MenueScene extends Phaser.Scene {
             button.setTexture('button1Active') // Change to active texture
             button.setTint(0x66ff7f)
 
-            this.buttonSelector.x = button.x + button.displayWidth * 0.5
-            this.buttonSelector.y = button.y + 10
 
             this.selectedButtonIndex = index
         }

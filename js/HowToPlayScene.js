@@ -2,20 +2,19 @@
 
 class HowToPlay extends Phaser.Scene {
     constructor() {
-        super({ key: "How2PlayScene" })
+        super({ key: "HowToPlayScene" })
     }
 
     preload() {
         // Bild preloaden
-        this.load.image('background', 'path/to/your/image.png')
+        this.load.image('panel', './content/ui/panel_brown.png')
     }
 
     create() {
-        console.log('Hello');
-        const { width, height } = this.scale
+        const { width, height  } = this.scale
 
         // Bild hinzufügen und zentrieren
-        const background = this.add.image(width / 2, height / 2, 'background')
+        const background = this.add.image(width / 2, height / 2, 'panel')
 
         // Text hinzufügen und zentrieren
         const instructionText = this.add.text(background.x, background.y, 'Welcome to the game!\nUse arrow keys to move.', {
