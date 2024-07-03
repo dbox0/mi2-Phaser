@@ -43,7 +43,7 @@ class Chunk {
               key = "sprSand";
               water = false;
             }
-            else if (perlinValue >= 0.33) {
+            else if (perlinValue >= 0.31) {
               key = "sprGrass";
               water = false;
             }
