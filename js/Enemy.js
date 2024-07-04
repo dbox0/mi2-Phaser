@@ -10,9 +10,15 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
     scene.physics.world.enable(this);
     this.scene.add.existing(this);
 
+    this.healthBar=this.makeBar(3,2,0x2ecc71);
+      this.setValue(this.healthBar,100);
+      this.healthBar.setDepth ( 1 );  
+
     this.firerate = 2000; // fire every 2 seconds
   
+    
     this.health = 3;
+    this.maxhealth = this.health;
     this.scene = scene;
     this.texture = texture
     this.setDepth(1);
@@ -31,7 +37,28 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
   
   }
 
+  makeBar(x, y,color) {
+    //draw the bar
+    let bar = this.scene.add.graphics();
 
+    //color the bar
+    bar.fillStyle(color, 1);
+
+    //fill the bar with a rectangle
+    bar.fillRect(0, 0, 200, 50);
+    
+    //position the bar
+    bar.x = x;
+    bar.y = y;
+
+    //return the bar
+    return bar;
+  }
+
+  setValue(bar,percentage) {
+    //scale the bar
+    bar.scaleX = percentage/100;
+}
 
   fireProjectile(){
     //console.log(this.player);
@@ -48,6 +75,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
     if(this.health <= 0){
       // play death anim () function
       this.destroy;
+      this.setValue (healthBar, this.health / this.maxHealth)
     }
   }
 
@@ -72,6 +100,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
     this.setVelocityY(normalizedY * this.speed)
     }
    
+    
 
   }
 
