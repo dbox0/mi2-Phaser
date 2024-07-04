@@ -20,8 +20,60 @@ class SceneMain extends Phaser.Scene {
 
     }
   
+    makeBar(x, y,color) {
+      //draw the bar
+      let bar = this.add.graphics();
+
+      //color the bar
+      bar.fillStyle(color, 1);
+
+      //fill the bar with a rectangle
+      bar.fillRect(0, 0, 200, 50);
+      
+      //position the bar
+      bar.x = x;
+      bar.y = y;
+
+      //return the bar
+      return bar;
+    }
+
+    setValue(bar,percentage) {
+      //scale the bar
+      bar.scaleX = percentage/100;
+  }
+
     create() {
       
+
+      // 5 Health bars
+      let healthBar=this.makeBar(140,100,0x2ecc71);
+      this.setValue(healthBar,5);
+      healthBar.setdepth ( 3 );
+
+      
+
+      
+    
+
+
+      this.input.on('pointerdown', function (pointer) {
+        // Get the x and y coordinates of the pointer
+        const screenX = pointer.x;
+        const screenY = pointer.y;
+
+        const playerX = this.ship.x;
+        const playerY = this.ship.y;
+
+        const worldX = playerX + (screenX - this.cameras.main.centerX);
+        const worldY = playerY + (screenY - this.cameras.main.centerY);
+
+        // Log the coordinates to the console
+        console.log('Pointer down at:', worldX, worldY);
+        let dirX = worldX - this.ship.x;
+        let dirY = worldY - this.ship.y;
+        let normalized = Math.sqrt(dirX*dirX + dirY*dirY)
+
       
 
 
