@@ -19,8 +19,9 @@ class SceneMain extends Phaser.Scene {
       this.load.image("playerproj","content/sprites/playerprojectile.png")
       this.load.audio('shot', 'content/sounds/enemycannonfire.mp3');
       this.load.audio('shotplayer', 'content/sounds/playercannonfire.mp3');
+      this.load.audio('playerdmg','content/sounds/ownshipdemage.mp3')
    
-   
+      
 
     }
   
@@ -54,6 +55,9 @@ class SceneMain extends Phaser.Scene {
     }
 
     create() {
+      this.gameOverText = this.add.text(16, 16, 'GAME OVER', { fontSize: '32px', fill: '#f00' });
+      this.gameOverText.setDepth (3);
+      this.gameOverText.setVisible(false)
       this.gameEnded = false;
 
       this.score = 0;
@@ -180,13 +184,14 @@ class SceneMain extends Phaser.Scene {
   
         const b = dirY/normalized;
         console.log("B: " + b)
-        var projectile = new Projectile(this,this.ship.x ,this.ship.y,"playerproj",a,b,100)
-        projectile.setDepth(2);
-        this.projectiles.add(projectile);
+        if(!this.gameEnded){
+          var projectile = new Projectile(this,this.ship.x ,this.ship.y,"playerproj",a,b,100)
+          projectile.setDepth(2);
+          this.projectiles.add(projectile);
+        }
+       
       
-        // Optionally, you can do something with these coordinates
-        // For example, create a sprite at the clicked position
-        // this.add.sprite(x, y, 'someSpriteKey');
+       
     }, this);
     
   }
@@ -215,7 +220,17 @@ class SceneMain extends Phaser.Scene {
     if(this.health > 0){
     this.health -= 1;
     this.setBarPercentage(this.healthBar,this.health*10*2)
+    let sound = this.sound.add('playerdmg');
+    sound.setLoop(false)
+    sound.setVolume(0.1)
+    sound.setDetune(Phaser.Math.Between(-700,10))
+    sound.play()
     } else {
+      let sound = this.sound.add('playerdmg');
+      sound.setLoop(false)
+      sound.setVolume(0.1)
+      sound.setDetune(Phaser.Math.Between(-400,10))
+      sound.play()
       this.gameOver();
     } 
     
@@ -224,6 +239,7 @@ class SceneMain extends Phaser.Scene {
   gameOver(){
     this.ship.destroy();
     this.gameEnded = true;
+    this.gameOverText.setVisible(true)
   }
 
   handleProjectileProjectileCollision(playerProjectile, enemyProjectile) {
@@ -273,8 +289,8 @@ getTileType(worldX, worldY, chunk, chunksize, tilesize) {
     }
 
     spawnEnemy(x,y){
-    //var enemy = this.enemies.create(x, y,'enemy',this.ship);
-    //enemy.setDepth(1);
+    var enemy = this.enemies.create(x, y,'enemy',this.ship);
+    enemy.setDepth(1);
     }
     
     
@@ -386,6 +402,8 @@ getTileType(worldX, worldY, chunk, chunksize, tilesize) {
       }
       this.scoreText.y = this.ship.y - 200
       this.scoreText.x = this.ship.x + 55
+      this.gameOverText.x = this.ship.x - 50
+      this.gameOverText.y = this.ship.y
       this.cameras.main.centerOn(this.ship.x, this.ship.y);
     }
   }

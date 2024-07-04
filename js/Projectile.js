@@ -17,6 +17,10 @@ class Projectile extends Phaser.Physics.Arcade.Sprite{
       this.setActive(false);
       this.setVisible(false);
       this.setDepth(1);
+
+      if(!enemy){
+        this.lifespan += 1000;
+      }
       
      // console.log("pew L" + this.dirX, + " " + this.dirY);
     
