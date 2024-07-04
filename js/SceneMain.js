@@ -28,7 +28,7 @@ class SceneMain extends Phaser.Scene {
       bar.fillStyle(color, 1);
 
       //fill the bar with a rectangle
-      bar.fillRect(0, 0, 200, 50);
+      bar.fillRect(0, 0, 30, 5);
       
       //position the bar
       bar.x = x;
@@ -38,48 +38,27 @@ class SceneMain extends Phaser.Scene {
       return bar;
     }
 
-    setValue(bar,percentage) {
+    setBarPercentage(bar,percentage) {
       //scale the bar
       bar.scaleX = percentage/100;
   }
 
+  
 
     meineFunktion (){
-      console.log (healthBar)
+      console.log (this.healthBar)
     }
 
     create() {
-      
+      this.health = 5;
 
       // Health bar
-      let healthBar=this.makeBar(140,100,0x2ecc71);
+      this.healthBar=this.makeBar(140,100,0x2ecc71);
  
  
-      this.setValue(healthBar,100);
-      healthBar.setDepth ( 3 );  
+      this.setBarPercentage(this.healthBar,100);
+      this.healthBar.setDepth ( 3 );  
     
-
-      this.input.on('pointerdown', function (pointer) {
-        // Get the x and y coordinates of the pointer
-        const screenX = pointer.x;
-        const screenY = pointer.y;
-
-        const playerX = this.ship.x;
-        const playerY = this.ship.y;
-
-        const worldX = playerX + (screenX - this.cameras.main.centerX);
-        const worldY = playerY + (screenY - this.cameras.main.centerY);
-
-        // Log the coordinates to the console
-        console.log('Pointer down at:', worldX, worldY);
-        let dirX = worldX - this.ship.x;
-        let dirY = worldY - this.ship.y;
-        let normalized = Math.sqrt(dirX*dirX + dirY*dirY)
-
-      
-
-      });
-
       this.i = 0;
       this.j = 0;
       this.currentFrameIndex = 0
@@ -194,7 +173,8 @@ class SceneMain extends Phaser.Scene {
         // For example, create a sprite at the clicked position
         // this.add.sprite(x, y, 'someSpriteKey');
     }, this);
-  
+    
+    
   
   }
     
@@ -214,6 +194,11 @@ class SceneMain extends Phaser.Scene {
   
   takeDamage(){
     //console.log("OUCH WATCH WHERE YER SAILIN ARRRR")
+    if(this.health > 0){
+    this.health -= 1;
+    this.setBarPercentage(this.healthBar,this.health*10*2)
+    }  
+    
   }
 
   handleProjectileProjectileCollision(playerProjectile, enemyProjectile) {
@@ -335,21 +320,21 @@ getTileType(worldX, worldY, chunk, chunksize, tilesize) {
   
       if (this.keyW.isDown) {
         this.ship.y -= 0.5;
-       // this.ship.setVelocityY(-20);
+        this.ship.setVelocityY(-20);
       }
       if (this.keyS.isDown) {
         this.ship.y += 0.5;
-       // this.ship.setVelocityY(20);
+        this.ship.setVelocityY(20);
       }
       if (this.keyA.isDown) {
         this.ship.x -= 0.5;
-       // this.ship.setVelocityX(-20);
+        this.ship.setVelocityX(-20);
         this.ship.flipX = true;
         
       }
       if (this.keyD.isDown) {
         this.ship.x += 0.5;
-        //this.ship.setVelocityX(20);
+        this.ship.setVelocityX(20);
         this.ship.flipX = false;
       }
 
@@ -359,8 +344,11 @@ getTileType(worldX, worldY, chunk, chunksize, tilesize) {
         this.ship.setVelocity(-this.ship.velocity)
       }
 
+      this.healthBar.x = this.ship.x -15
+      this.healthBar.y = this.ship.y + 20
       //console.log(this.getChunk(this.ship.x,this.ship.y));
-  
+      
+
       this.cameras.main.centerOn(this.ship.x, this.ship.y);
     }
   }

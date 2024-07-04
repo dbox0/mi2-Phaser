@@ -10,13 +10,14 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
     scene.physics.world.enable(this);
     this.scene.add.existing(this);
 
-    this.healthBar=this.makeBar(3,2,0x2ecc71);
-      this.setValue(this.healthBar,100);
-      this.healthBar.setDepth ( 1 );  
+
+    this.healthBar=this.makeBar(3,2,0x911c1e);
+    this.setValue(this.healthBar,100);
+    this.healthBar.setDepth ( 1 );  
 
     this.firerate = 2000; // fire every 2 seconds
   
-    
+    this.isdead = false;
     this.health = 3;
     this.maxhealth = this.health;
     this.scene = scene;
@@ -24,9 +25,13 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
     this.setDepth(1);
     this.attackspeed = 100;
     this.speed = 20;
+    
+    this.rand = Math.random()*1000
     this.scene.time.addEvent({
 
-      delay: this.firerate,
+
+
+      delay: (this.firerate + this.rand),
       callback: this.fireProjectile,
       callbackScope: this,
       loop: true
@@ -45,7 +50,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
     bar.fillStyle(color, 1);
 
     //fill the bar with a rectangle
-    bar.fillRect(0, 0, 200, 50);
+    bar.fillRect(0, 0, 30, 5);
     
     //position the bar
     bar.x = x;
@@ -61,12 +66,18 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
 }
 
   fireProjectile(){
-    //console.log(this.player);
+
+    if(!this.isdead){
+//console.log(this.player);
     var dirx = this.player.x - this.x;
     //console.log(this.player.y - this.y)
     
     var diry = this.player.y - this.y;
-    var projectile = new Projectile(this.scene,this.x,this.y,"projectile",dirx,diry,this.attackspeed);
+    var projectile = new Projectile(this.scene,this.x,this.y,"projectile",dirx,diry,this.attackspeed)
+    this.scene.enemyprojectiles.add(projectile);
+    projectile.setDepth(1);
+    
+    }
     
     }
   
@@ -74,9 +85,12 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
     this.health -= 1;
     if(this.health <= 0){
       // play death anim () function
-      this.destroy;
-      this.setValue (healthBar, this.health / this.maxHealth)
-    }
+      this.isdead = true;
+      this.healthBar.destroy();
+      this.destroy();
+      
+    }else{
+    this.setValue (this.healthBar, this.health*10*3)}
   }
 
   setVelocity(x,y){
@@ -87,9 +101,11 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
     let dirX =this.player.x-this.x
     let dirY = this.player.y-this.y
     
+    this.healthBar.x = this.x -10
+    this.healthBar.y = this.y +20
     let magnitude = Math.sqrt(dirX*dirX + dirY*dirY);
     if(magnitude > 150){
- let normalizedX = dirX/magnitude
+    let normalizedX = dirX/magnitude
     let normalizedY = dirY/magnitude
 
     /*
