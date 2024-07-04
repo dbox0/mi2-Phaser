@@ -153,7 +153,8 @@ class SceneMain extends Phaser.Scene {
         const worldY = playerY + (screenY - this.cameras.main.centerY);
 
         const chunkAt = this.getChunkAtPos(worldX,worldY);
-        console.log(chunkAt.x,chunkAt.y);
+       // var particle  = new Projectile(this,worldX,worldY,"playerproj",0,0,0)
+        console.log("Clicked chunk is at " + chunkAt.x,chunkAt.y);
         console.log(this.getTileType(worldX,worldY,chunkAt,this.chunkSize,this.tileSize))
         // Log the coordinates to the console
         //console.log('Pointer down at:', worldX, worldY);
@@ -219,13 +220,8 @@ getTileType(worldX, worldY, chunk, chunksize, tilesize) {
   // Determine the tile coordinates within the chunk
   const tileXInChunk = Math.floor((worldX % (chunksize * tilesize)) );
   const tileYInChunk = Math.floor((worldY % (chunksize * tilesize)));
-  console.log(worldX,worldY,tileXInChunk,tileYInChunk)
-  //console.log("Tile X in Chunk:", tileXInChunk, "Tile Y in Chunk:", tileYInChunk);
-  
-  // Calculate the tile's exact world position
-  const tileWorldX = chunk.x * chunksize * tilesize + tileXInChunk * tilesize;
-  const tileWorldY = chunk.y * chunksize * tilesize + tileYInChunk * tilesize;
-  console.log("Expected tile world position:", tileWorldX, tileWorldY , worldX,worldY);
+
+  console.log(tileXInChunk,tileYInChunk)
   
   // Find the tile in the chunk's tile group
   const tile = chunk.tiles.getChildren().find(tile => {
@@ -254,8 +250,8 @@ getTileType(worldX, worldY, chunk, chunksize, tilesize) {
     }
 
     spawnEnemy(x,y){
-    var enemy = this.enemies.create(x, y,'enemy',this.ship);
-    enemy.setDepth(1);
+    //var enemy = this.enemies.create(x, y,'enemy',this.ship);
+    //enemy.setDepth(1);
     }
     
     
@@ -322,32 +318,36 @@ getTileType(worldX, worldY, chunk, chunksize, tilesize) {
   
       if (this.keyW.isDown) {
         this.ship.y -= 0.5;
-        this.ship.setVelocityY(-20);
+       // this.ship.setVelocityY(-20);
       }
       if (this.keyS.isDown) {
         this.ship.y += 0.5;
-        this.ship.setVelocityY(20);
+      //  this.ship.setVelocityY(20);
       }
       if (this.keyA.isDown) {
         this.ship.x -= 0.5;
-        this.ship.setVelocityX(-20);
+        //this.ship.setVelocityX(-20);
         this.ship.flipX = true;
         
       }
       if (this.keyD.isDown) {
         this.ship.x += 0.5;
-        this.ship.setVelocityX(20);
+       // this.ship.setVelocityX(20);
         this.ship.flipX = false;
       }
 
       var chunk = this.getChunkAtPos(this.ship.x,this.ship.y);
-     
+      var a = chunk.getTileAtWorldPosition(this.ship.x,this.ship.y)
+      console.log(chunk.x,chunk.y,"  ",);
 
       this.healthBar.x = this.ship.x -15
       this.healthBar.y = this.ship.y + 20
       //console.log(this.getChunk(this.ship.x,this.ship.y));
       
-
+      this.mousePosX = game.input.mousePointer.x;
+      this.mousePosY = game.input.mousePointer.y;
+     // console.log(this.mousePosX,this.mousePosY)
+      
       this.cameras.main.centerOn(this.ship.x, this.ship.y);
     }
   }

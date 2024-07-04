@@ -19,6 +19,29 @@ class Chunk {
         this.isLoaded = false;
       }
     }
+
+    
+    getTileAtWorldPosition(worldX, worldY) {
+      // Calculate local tile coordinates
+      //console.log(this.x,this.y)
+      const localX = Math.floor((worldX - (this.x * this.scene.chunkSize * this.scene.tileSize)) / this.scene.tileSize);
+      const localY = Math.floor((worldY - (this.y * this.scene.chunkSize * this.scene.tileSize)) / this.scene.tileSize)
+      const X = Math.round(worldX)
+      const Y = Math.round(worldY)
+     // console.log(worldX,worldY,localX,localY, "BLAS");
+      // Check if the local coordinates are within the chunk
+      let tile = null;
+      console.log(localX,localY, "world: " ,X,Y)
+      if (localX >= -8 && localX <= 8 && localY >= -8 && localY <= 8) {
+        // Find the tile at the local coordinates
+        tile = this.tiles.getChildren().find(t => t.x === X && t.y === Y);
+        if(tile){
+          console.log(tile.texture.key)}
+        
+      }
+     // console.log(tile.texture.key)
+      return null; // Return null if no tile is found or coordinates are out of bounds
+    }
   
     load(player) {
       if (!this.isLoaded) {
@@ -94,7 +117,7 @@ class Chunk {
       if(keyframe !== ""){
         this.play(keyframe)
       }
-      
+      console.log(this.x,this.y)
       this.scene.time.addEvent(
         {
          delay: 100000000,
