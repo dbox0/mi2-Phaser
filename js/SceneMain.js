@@ -153,6 +153,7 @@ class SceneMain extends Phaser.Scene {
         const worldY = playerY + (screenY - this.cameras.main.centerY);
 
         const chunkAt = this.getChunkAtPos(worldX,worldY);
+        console.log(chunkAt.x,chunkAt.y);
         console.log(this.getTileType(worldX,worldY,chunkAt,this.chunkSize,this.tileSize))
         // Log the coordinates to the console
         //console.log('Pointer down at:', worldX, worldY);
@@ -187,7 +188,7 @@ class SceneMain extends Phaser.Scene {
      }
 
   handlePlayerOnHit(player, projectile,){
-    console.log(projectile)
+    //console.log(projectile)
     projectile.deactivate();
     this.takeDamage()
   }
@@ -216,19 +217,20 @@ getTileType(worldX, worldY, chunk, chunksize, tilesize) {
   //console.log("Chunk size:", chunksize, "Tile size:", tilesize);
   
   // Determine the tile coordinates within the chunk
-  const tileXInChunk = Math.floor((worldX % (chunksize * tilesize)) / tilesize);
-  const tileYInChunk = Math.floor((worldY % (chunksize * tilesize)) / tilesize);
- // console.log("Tile X in Chunk:", tileXInChunk, "Tile Y in Chunk:", tileYInChunk);
+  const tileXInChunk = Math.floor((worldX % (chunksize * tilesize)) );
+  const tileYInChunk = Math.floor((worldY % (chunksize * tilesize)));
+  console.log(worldX,worldY,tileXInChunk,tileYInChunk)
+  //console.log("Tile X in Chunk:", tileXInChunk, "Tile Y in Chunk:", tileYInChunk);
   
   // Calculate the tile's exact world position
   const tileWorldX = chunk.x * chunksize * tilesize + tileXInChunk * tilesize;
   const tileWorldY = chunk.y * chunksize * tilesize + tileYInChunk * tilesize;
- // console.log("Expected tile world position:", tileWorldX, tileWorldY , worldX,worldY);
+  console.log("Expected tile world position:", tileWorldX, tileWorldY , worldX,worldY);
   
   // Find the tile in the chunk's tile group
   const tile = chunk.tiles.getChildren().find(tile => {
     //console.log("Checking tile at:", tile.x, tile.y);
-    return tile.x === Math.floor(tileWorldX) && tile.y === Math.floor(tileWorldY);
+    return tile.x === tileXInChunk && tile.y === tileYInChunk;
   });
 
   if (tile) {

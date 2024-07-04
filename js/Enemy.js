@@ -4,7 +4,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
   constructor(scene, x, y, texture, player ){
     super(scene,x,y,texture);
     this.player = player;
-    console.log(this.player);
+   
     //console.log(this.player.x)
     //console.log(this.player.y)
     scene.physics.world.enable(this);
@@ -36,8 +36,6 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
       callbackScope: this,
       loop: true
     });
-    console.log("Enemy spawned");
-    
 
   
   }
