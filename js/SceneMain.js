@@ -356,7 +356,7 @@ getTileType(worldX, worldY, chunk, chunksize, tilesize) {
           
     
 
-          this.ship.setVelocity(-this.vel.x*1.05,-this.vel.y*1.05)
+          this.ship.setVelocity(-this.vel.x,-this.vel.y)
         }
       }
       //console.log(chunk.x,chunk.y,"  ",);
