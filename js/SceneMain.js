@@ -202,7 +202,7 @@ class SceneMain extends Phaser.Scene {
   }
 
   handleProjectileProjectileCollision(playerProjectile, enemyProjectile) {
-    playerProjectile.deactivate();
+    //playerProjectile.deactivate();
     enemyProjectile.deactivate();
 
     // Play explosion animation at the point of collision
@@ -339,10 +339,7 @@ getTileType(worldX, worldY, chunk, chunksize, tilesize) {
       }
 
       var chunk = this.getChunkAtPos(this.ship.x,this.ship.y);
-      if(this.getTileType(this.ship.x,this.ship.y,chunk,16,16) == 'SprSand'){
-        console.log("boop")
-        this.ship.setVelocity(-this.ship.velocity)
-      }
+     
 
       this.healthBar.x = this.ship.x -15
       this.healthBar.y = this.ship.y + 20
