@@ -17,6 +17,10 @@ class SceneMain extends Phaser.Scene {
       this.load.image("enemy","content/sprites/shiptest.png")
       this.load.image("projectile","content/sprites/projectile.png")
       this.load.image("playerproj","content/sprites/playerprojectile.png")
+      this.load.audio('shot', 'content/sounds/enemycannonfire.mp3');
+      this.load.audio('shotplayer', 'content/sounds/playercannonfire.mp3');
+   
+   
 
     }
   
@@ -50,6 +54,7 @@ class SceneMain extends Phaser.Scene {
     }
 
     create() {
+      this.gameEnded = false;
       this.health = 5;
 
       // Health bar
@@ -127,7 +132,7 @@ class SceneMain extends Phaser.Scene {
       this.ship.setDepth(1);
       this.enemies.setDepth(1);
       
-
+      this.vel = null
 
       
       this.time.addEvent(
@@ -176,8 +181,6 @@ class SceneMain extends Phaser.Scene {
         // this.add.sprite(x, y, 'someSpriteKey');
     }, this);
     
-    
-  
   }
     
     printplayer(){
@@ -199,8 +202,15 @@ class SceneMain extends Phaser.Scene {
     if(this.health > 0){
     this.health -= 1;
     this.setBarPercentage(this.healthBar,this.health*10*2)
-    }  
+    } else {
+      this.gameOver();
+    } 
     
+  }
+
+  gameOver(){
+    this.ship.destroy();
+    this.gameEnded = true;
   }
 
   handleProjectileProjectileCollision(playerProjectile, enemyProjectile) {
@@ -315,39 +325,51 @@ getTileType(worldX, worldY, chunk, chunksize, tilesize) {
       }
 
       
-  
-      if (this.keyW.isDown) {
-        this.ship.y -= 0.5;
-       // this.ship.setVelocityY(-20);
+      if(!this.gameEnded){if (this.keyW.isDown) {
+        this.ship.y -= 0.2;
+        this.ship.setVelocityY(-20);
       }
       if (this.keyS.isDown) {
-        this.ship.y += 0.5;
-      //  this.ship.setVelocityY(20);
+        this.ship.y += 0.2;
+       this.ship.setVelocityY(20);
       }
       if (this.keyA.isDown) {
-        this.ship.x -= 0.5;
-        //this.ship.setVelocityX(-20);
+        this.ship.x -= 0.2;
+        this.ship.setVelocityX(-20);
         this.ship.flipX = true;
         
       }
       if (this.keyD.isDown) {
-        this.ship.x += 0.5;
-       // this.ship.setVelocityX(20);
+        this.ship.x += 0.2;
+        this.ship.setVelocityX(20);
         this.ship.flipX = false;
       }
 
       var chunk = this.getChunkAtPos(this.ship.x,this.ship.y);
-      var a = chunk.getTileAtWorldPosition(this.ship.x,this.ship.y)
-      console.log(chunk.x,chunk.y,"  ",);
+      let ontiletype = chunk.getTileAtWorldPosition(this.ship.x,this.ship.y)
+      console.log(ontiletype)
+
+      if(ontiletype){
+        if(ontiletype == 'sprGrass' || ontiletype == 'sprSand'){
+          
+          this.vel = this.ship.body.velocity
+          
+    
+
+          this.ship.setVelocity(-this.vel.x*1.05,-this.vel.y*1.05)
+        }
+      }
+      //console.log(chunk.x,chunk.y,"  ",);
 
       this.healthBar.x = this.ship.x -15
       this.healthBar.y = this.ship.y + 20
-      //console.log(this.getChunk(this.ship.x,this.ship.y));
+      }
       
       this.mousePosX = game.input.mousePointer.x;
       this.mousePosY = game.input.mousePointer.y;
      // console.log(this.mousePosX,this.mousePosY)
-      
-      this.cameras.main.centerOn(this.ship.x, this.ship.y);
+      if(this.ship){
+        this.cameras.main.centerOn(this.ship.x, this.ship.y);
+      }
     }
   }

@@ -70,12 +70,17 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
     var dirx = this.player.x - this.x;
     //console.log(this.player.y - this.y)
     
-    var diry = this.player.y - this.y;
-    var projectile = new Projectile(this.scene,this.x,this.y,"projectile",dirx,diry,this.attackspeed)
-    this.scene.enemyprojectiles.add(projectile);
-    projectile.setDepth(1);
-    
+    let distanceVector = [this.x - this.player.x,this.y - this.player.y];
+    const distance = Math.sqrt(distanceVector[0]*distanceVector[0]+distanceVector[1]*distanceVector[1]);
+    if(distance < 300){
+      var diry = this.player.y - this.y;
+      var projectile = new Projectile(this.scene,this.x,this.y,"projectile",dirx,diry,this.attackspeed,true)
+      this.scene.enemyprojectiles.add(projectile);
+      projectile.setDepth(1);
+      
+      }
     }
+    
     
     }
   

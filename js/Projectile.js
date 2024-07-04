@@ -1,7 +1,7 @@
 
 
 class Projectile extends Phaser.Physics.Arcade.Sprite{
-    constructor(scene, x, y , texture , a,b,speed ){
+    constructor(scene, x, y , texture , a,b,speed ,enemy ){
       super(scene,x,y,texture);
       this.speed = speed;
       this.scene = scene;
@@ -12,12 +12,32 @@ class Projectile extends Phaser.Physics.Arcade.Sprite{
       this.speed = speed;
       this.lifespan = 2000;
       this.setDepth(1);
-  
+      
+      this.enemy = enemy;
       this.setActive(false);
       this.setVisible(false);
       this.setDepth(1);
+      
      // console.log("pew L" + this.dirX, + " " + this.dirY);
     
+      
+
+      if(enemy){let sound = this.scene.sound.add('shot');
+      sound.setVolume(0.5);
+      sound.setLoop(false);
+      sound.setDetune(Phaser.Math.Between(-1000,200))
+      sound.play();
+      }
+      else{let sound = this.scene.sound.add('shot' /*shotplayer*/);
+      sound.setVolume(0.2);
+      sound.setLoop(false);
+      sound.setDetune(Phaser.Math.Between(-1000,-500))
+      sound.play();
+      }
+    
+    
+
+
       this.setDepth(1);
       this.setActive(true);
       this.setVisible(true);

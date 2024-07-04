@@ -24,33 +24,43 @@ class Chunk {
     getTileAtWorldPosition(worldX, worldY) {
       // Calculate local tile coordinates
       //console.log(this.x,this.y)
-      const localX = Math.floor((worldX - (this.x * this.scene.chunkSize * this.scene.tileSize)) / this.scene.tileSize);
-      const localY = Math.floor((worldY - (this.y * this.scene.chunkSize * this.scene.tileSize)) / this.scene.tileSize)
+      const localX = Math.floor((worldX - (this.x * this.scene.chunkSize * this.scene.tileSize)) / this.scene.tileSize)%512;
+      const localY = Math.floor((worldY - (this.y * this.scene.chunkSize * this.scene.tileSize)) / this.scene.tileSize%512)
       const X = Math.round(worldX)
       const Y = Math.round(worldY)
+
+
      // console.log(worldX,worldY,localX,localY, "BLAS");
       // Check if the local coordinates are within the chunk
       let tile = null;
-      console.log(localX,localY, "world: " ,X,Y)
-      if (localX >= -8 && localX <= 8 && localY >= -8 && localY <= 8) {
+      if (localX >= -8 && localX <= 7 && localY >= -8 && localY <= 7) {
         // Find the tile at the local coordinates
-        tile = this.tiles.getChildren().find(t => t.x === X && t.y === Y);
-        if(tile){
-          console.log(tile.texture.key)}
-        
+        const tileX = (this.x * this.scene.chunkSize * this.scene.tileSize) + (localX * this.scene.tileSize);
+        const tileY = (this.y * this.scene.chunkSize * this.scene.tileSize) + (localY * this.scene.tileSize);
+         // console.log(tileX,tileY);
+        const tile = this.tiles.getChildren().find(t => t.x === tileX && t.y === tileY);
+        if (tile) {
+
+          console.log(tile.texture.key)
+          return(tile.texture.key)
+        }
       }
-     // console.log(tile.texture.key)
+  
       return null; // Return null if no tile is found or coordinates are out of bounds
+     // Return null if no tile is found or coordinates are out of bounds
     }
   
     load(player) {
+      var min = 0;
+      var max = 0;
       if (!this.isLoaded) {
         for (var x = 0; x < this.scene.chunkSize; x++) {
           for (var y = 0; y < this.scene.chunkSize; y++) {
   
-            var tileX = (this.x * (this.scene.chunkSize * this.scene.tileSize)) + (x * this.scene.tileSize);
-            var tileY = (this.y * (this.scene.chunkSize * this.scene.tileSize)) + (y * this.scene.tileSize);
-  
+            var tileX = (this.x * (this.scene.chunkSize * this.scene.tileSize)) + (x * this.scene.tileSize) ;
+            var tileY = (this.y * (this.scene.chunkSize * this.scene.tileSize)) + (y * this.scene.tileSize) ;
+            
+            console.log(tileX,tileY)
             var perlinValue = noise.perlin2(0.5* tileX / 100
             , 0.5* tileY / 100);
   
@@ -77,8 +87,14 @@ class Chunk {
               key = "sprGrass";
               water = false;
             }
-  
-  
+            
+            if(tileX < min){
+              min = tileX
+              console.log(min)
+            }
+            if(tileX > max){
+              max = tileX
+            }
             var tile = new Tile(this.scene, tileX, tileY, key, water,this.keyframe,spawner,player);
   
             if (animationKey !== "") {
@@ -91,7 +107,7 @@ class Chunk {
             
           }
         }
-  
+        console.log("MIN MAX " , min, max)
         this.isLoaded = true;
       }
     
@@ -117,7 +133,6 @@ class Chunk {
       if(keyframe !== ""){
         this.play(keyframe)
       }
-      console.log(this.x,this.y)
       this.scene.time.addEvent(
         {
          delay: 100000000,
