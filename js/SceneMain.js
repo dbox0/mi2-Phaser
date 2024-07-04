@@ -49,14 +49,9 @@ class SceneMain extends Phaser.Scene {
       // 5 Health bars
       let healthBar=this.makeBar(140,100,0x2ecc71);
       this.setValue(healthBar,5);
-      healthBar.setdepth ( 3 );
+      healthBar.setDepth ( 3 );
 
-      
-
-      
-    
-
-
+ 
       this.input.on('pointerdown', function (pointer) {
         // Get the x and y coordinates of the pointer
         const screenX = pointer.x;
@@ -76,6 +71,7 @@ class SceneMain extends Phaser.Scene {
 
       
 
+      });
 
       this.i = 0;
       this.j = 0;
@@ -94,6 +90,7 @@ class SceneMain extends Phaser.Scene {
          // currentFrameIndex = frame.index;
         //}
       });
+
       this.projectiles = this.physics.add.group({
         classType: Projectile,
         runChildUpdate: true
@@ -190,8 +187,9 @@ class SceneMain extends Phaser.Scene {
         // For example, create a sprite at the clicked position
         // this.add.sprite(x, y, 'someSpriteKey');
     }, this);
-      
-    }
+  
+  
+  }
     
     printplayer(){
       //console.log(this.ship.x,this.ship.y)
