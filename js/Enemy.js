@@ -87,6 +87,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
       // play death anim () function
       this.isdead = true;
       this.healthBar.destroy();
+      this.scene.increaseScore();
       this.destroy();
       
     }else{
