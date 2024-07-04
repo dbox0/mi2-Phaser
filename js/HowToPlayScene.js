@@ -120,18 +120,16 @@ class HowToPlay extends Phaser.Scene {
 
     confirmSelection() {
         const selectedLabel = this.buttonLabels[this.selectedButtonIndex]
-        switch (selectedLabel) {
-            case 'MenueScene':
-                this.scene.start('MenueScene') 
-                break;
-            default:
-                break;
+                this.scene.stop('MenueScene');
+                this.scene.start('MenueScene');
+                
+            
 
         }        
     }
 
     
-}
+
 
 
 

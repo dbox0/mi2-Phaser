@@ -2,7 +2,7 @@
 
 class MenueScene extends Phaser.Scene {
     constructor() {
-        super('main-menu')
+        super({ key: "MenueScene" })
         this.buttons = []
         this.buttonLabels = ['Play', 'How2Play', 'Credits']
         this.selectedButtonIndex = 0
@@ -12,9 +12,16 @@ class MenueScene extends Phaser.Scene {
         this.load.image('button1', './content/ui/buttonLong_brown.png')
         this.load.image('button1Active', './content/ui/buttonLong_brown_pressed.png')
         this.load.image('cursor', './content/ui/cursorGauntlet_grey.png')
+        this.load.image('background', './content/sprites/menuebg.jpg')
     }
 
     create() {
+
+        let image = this.add.image(0, 0, 'background');
+            image.setOrigin(0, 0);
+            image.displayWidth = this.sys.game.config.width;
+            image.displayHeight = this.sys.game.config.height;
+
         console.log("Entered Main Menu")
         const { width, height } = this.scale
 
