@@ -55,6 +55,11 @@ class SceneMain extends Phaser.Scene {
 
     create() {
       this.gameEnded = false;
+
+      this.score = 0;
+      this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#fff' });
+      this.scoreText.setDepth (4);
+
       this.health = 5;
 
       // Health bar
@@ -86,6 +91,9 @@ class SceneMain extends Phaser.Scene {
         classType: Projectile,
         runChildUpdate: true
     });
+
+
+  
 
 
       this.enemies = this.physics.add.group({
@@ -182,6 +190,11 @@ class SceneMain extends Phaser.Scene {
     }, this);
     
   }
+
+  increaseScore() {
+    this.score += 1;
+    this.scoreText.setText('Score: ' + this.score);
+    }
     
     printplayer(){
       //console.log(this.ship.x,this.ship.y)
@@ -371,5 +384,8 @@ getTileType(worldX, worldY, chunk, chunksize, tilesize) {
       if(this.ship){
         this.cameras.main.centerOn(this.ship.x, this.ship.y);
       }
+      this.scoreText.y = this.ship.y - 200
+      this.scoreText.x = this.ship.x + 55
+      this.cameras.main.centerOn(this.ship.x, this.ship.y);
     }
   }
