@@ -43,15 +43,22 @@ class SceneMain extends Phaser.Scene {
       bar.scaleX = percentage/100;
   }
 
+
+    meineFunktion (){
+      console.log (healthBar)
+    }
+
     create() {
       
 
-      // 5 Health bars
+      // Health bar
       let healthBar=this.makeBar(140,100,0x2ecc71);
-      this.setValue(healthBar,5);
-      healthBar.setDepth ( 3 );
-
  
+ 
+      this.setValue(healthBar,100);
+      healthBar.setDepth ( 3 );  
+    
+
       this.input.on('pointerdown', function (pointer) {
         // Get the x and y coordinates of the pointer
         const screenX = pointer.x;
