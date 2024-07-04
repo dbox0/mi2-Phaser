@@ -18,9 +18,11 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
     this.attackspeed = 100;
     this.speed = 20;
     this.isDead = false;
+
+    let rand = Math.random()*1000
     this.scene.time.addEvent({
 
-      delay: this.firerate,
+      delay: (this.firerate + rand),
       callback: this.fireProjectile,
       callbackScope: this,
       loop: true
@@ -29,8 +31,6 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
 
   
   }
-
-
 
   fireProjectile(){
     if(!this.isDead){

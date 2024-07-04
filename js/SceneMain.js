@@ -221,17 +221,17 @@ class SceneMain extends Phaser.Scene {
 
 
 getTileType(worldX, worldY, chunk, chunksize, tilesize) {
-  console.log("Chunk size:", chunksize, "Tile size:", tilesize);
+  //console.log("Chunk size:", chunksize, "Tile size:", tilesize);
   
   // Determine the tile coordinates within the chunk
   const tileXInChunk = Math.floor((worldX % (chunksize * tilesize)) / tilesize);
   const tileYInChunk = Math.floor((worldY % (chunksize * tilesize)) / tilesize);
-  console.log("Tile X in Chunk:", tileXInChunk, "Tile Y in Chunk:", tileYInChunk);
+ // console.log("Tile X in Chunk:", tileXInChunk, "Tile Y in Chunk:", tileYInChunk);
   
   // Calculate the tile's exact world position
   const tileWorldX = chunk.x * chunksize * tilesize + tileXInChunk * tilesize;
   const tileWorldY = chunk.y * chunksize * tilesize + tileYInChunk * tilesize;
-  console.log("Expected tile world position:", tileWorldX, tileWorldY , worldX,worldY);
+ // console.log("Expected tile world position:", tileWorldX, tileWorldY , worldX,worldY);
   
   // Find the tile in the chunk's tile group
   const tile = chunk.tiles.getChildren().find(tile => {
@@ -240,10 +240,10 @@ getTileType(worldX, worldY, chunk, chunksize, tilesize) {
   });
 
   if (tile) {
-    console.log("Tile found:", tile.texture.key);
+   // console.log("Tile found:", tile.texture.key);
     return tile.texture.key; // Assuming `type` is stored in `texture.key`
   } else {
-    console.log("Tile not found at:", tileXInChunk, tileYInChunk);
+    //console.log("Tile not found at:", tileXInChunk, tileYInChunk);
     return null;
   }
 }
@@ -260,8 +260,8 @@ getTileType(worldX, worldY, chunk, chunksize, tilesize) {
     }
 
     spawnEnemy(x,y){
-    //var enemy = this.enemies.create(x, y,'enemy',this.ship);
-    //enemy.setDepth(1);
+    var enemy = this.enemies.create(x, y,'enemy',this.ship);
+    enemy.setDepth(1);
     }
     
     
