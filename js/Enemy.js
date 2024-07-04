@@ -4,7 +4,6 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
   constructor(scene, x, y, texture, player ){
     super(scene,x,y,texture);
     this.player = player;
-    console.log(this.player);
     //console.log(this.player.x)
     //console.log(this.player.y)
     scene.physics.world.enable(this);
@@ -18,6 +17,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
     this.setDepth(1);
     this.attackspeed = 100;
     this.speed = 20;
+    this.isDead = false;
     this.scene.time.addEvent({
 
       delay: this.firerate,
@@ -25,7 +25,6 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
       callbackScope: this,
       loop: true
     });
-    console.log("Enemy spawned");
     
 
   
@@ -34,20 +33,30 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
 
 
   fireProjectile(){
-    //console.log(this.player);
+    if(!this.isDead){
+  //console.log(this.player);
     var dirx = this.player.x - this.x;
     //console.log(this.player.y - this.y)
-    
     var diry = this.player.y - this.y;
-    var projectile = new Projectile(this.scene,this.x,this.y,"projectile",dirx,diry,this.attackspeed);
+
+    var projectile = new Projectile(this.scene,this.x,this.y,"projectile",dirx,diry,this.attackspeed)
+    this.scene.enemyprojectiles.add(projectile);
+    projectile.setDepth(1);
+    }
     
     }
   
   takeDamage(){
+    console.log("Enemy: Ouch. Health remaining :" +this.health)
     this.health -= 1;
     if(this.health <= 0){
+      this.isDead = true;
       // play death anim () function
-      this.destroy;
+      console.log("Im dead")
+      this.scene.physics.world.disable(this);
+      this.setActive(false)
+      this.scene.enemies.remove(this)
+      this.destroy();
     }
   }
 

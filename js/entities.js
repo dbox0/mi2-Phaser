@@ -8,17 +8,8 @@ class Chunk {
       this.isLoaded = false;
       this.keyframe = animationkey;
       this.player = player;
-
-      console.log(this.x + " ::::" + this.y)
-      console.log(this.isLoaded)
-      
-     
-    
     }
     
-    getTileType(i,j,currentFrameIndex){
-
-    }
 
   
     unload() {
@@ -49,12 +40,12 @@ class Chunk {
               key = "sprWater";
               animationKey = "sprWater";
             }
-            else if (perlinValue >= 0.2 && perlinValue < 0.3035) {
+            else if (perlinValue >= 0.2 && perlinValue < 0.3037) {
               key = "sprSand";
               water = false;
             }
-            else if(perlinValue >= 0.3035 && perlinValue < 0.31){
-              key = "";
+            else if(perlinValue >= 0.3037 && perlinValue < 0.31){
+              key = "sprHouse";
               spawner = true;
 
 
@@ -93,6 +84,7 @@ class Chunk {
   class Tile extends Phaser.GameObjects.Sprite {
     constructor(scene, x, y, key, water,keyframe, spawner,player) {
       super(scene, x, y, key);
+      this.key = key;
       this.water = water;
       this.scene = scene;
       this.scene.add.existing(this);
