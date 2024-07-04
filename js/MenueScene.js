@@ -13,6 +13,7 @@ class MenueScene extends Phaser.Scene {
         this.load.image('button1Active', './content/ui/buttonLong_brown_pressed.png')
         this.load.image('cursor', './content/ui/cursorGauntlet_grey.png')
         this.load.image('background', './content/sprites/menuebg.jpg')
+        this.load.audio('backgroundmusic', 'content/sounds/flat-8-bit-gaming-music-instrumental-211547.mp3');
     }
 
     create() {
@@ -24,6 +25,23 @@ class MenueScene extends Phaser.Scene {
 
         console.log("Entered Main Menu")
         const { width, height } = this.scale
+
+
+        let button = this.add.image(100, 100, 'button');
+        button.setInteractive();
+
+        let music = this.sound.add('backgroundmusic');
+            music.setVolume(0.1);
+            music.setLoop(true);
+            music.play();
+
+            button.on('pointerdown', function () {
+                if (musik.isPlaying) {
+                    musik.pause();
+                } else {
+                    musik.resume();
+                }
+            });    
 
         // Play button Erstellen
         const playButton = this.add.image(width * 0.5, height * 0.6, 'button1')
