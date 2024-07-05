@@ -5,6 +5,10 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
     super(scene,x,y,texture);
     this.player = player;
     this.freeze = false;
+
+    scene.physics.world.enable(this);
+    this.scene.add.existing(this);
+
     let dirX =this.player.x-this.x
     let dirY = this.player.y-this.y
     let magnitude = Math.sqrt(dirX*dirX + dirY*dirY);
@@ -12,28 +16,14 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
     let vectorx = dirX/magnitude;
     let vectory = dirY/magnitude
 
-    var chunk = this.scene.getChunkAtPos(this.x + vectorx*100, this.y + vectory*100)
-    let ontiletype = chunk.getTileAtWorldPosition(this.x + (vectorx*100),this.y+(vectory*100))
 
-    /*if(ontiletype == 'sprHouse' || ontiletype == 'sprSand' || ontiletype == 'sprGrass'){
-      this.x += vectorx *100
-      this.y += vectory*100
-    } else {
-      this.x -= vectorx *100
-      this.y -= vectory*100
-    }*/
+    this.x += vectorx *128
+    this.y += vectory*128
 
-    this.x += vectorx *100
-    this.y += vectory*100
-  
 
-    this.lastposx = this.x
-    this.lastposy = this.y
+ 
     //console.log(this.player.x)
     //console.log(this.player.y)
-    scene.physics.world.enable(this);
-    this.scene.add.existing(this);
-
 
     this.healthBar=this.makeBar(3,2,0x911c1e);
     this.setValue(this.healthBar,100);
@@ -53,15 +43,23 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
     this.rand = Math.random()*1000
     this.scene.time.addEvent({
 
-
-
       delay: (this.firerate + this.rand),
       callback: this.fireProjectile,
       callbackScope: this,
       loop: true
     });
 
+    if(!this.checkTile){
+      this.die();
+    }
+
   
+  }
+  checkTile() {
+    var chunk = this.scene.getChunkAtPos(this.x, this.y);
+    if (chunk.getTileAtWorldPosition(this.x, this.y) === 'sprWater') {
+      return true;
+    }
   }
 
   makeBar(x, y,color) {
@@ -80,6 +78,20 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
 
     //return the bar
     return bar;
+  }
+
+
+  die(){
+    console.log("Died")
+    this.isdead = true;
+    if (this.body) {
+      this.body.setEnable(false); // Disable physics body
+    }
+    if (this.healthBar) {
+      this.healthBar.destroy();
+    }
+    this.setVisible(false)
+    this.destroy();
   }
 
   setValue(bar,percentage) {
@@ -112,13 +124,15 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
     this.health -= 1;
     if(this.health <= 0){
       // play death anim () function
-      this.isdead = true;
-      this.healthBar.destroy();
-      this.scene.increaseScore();
-      this.destroy();
+      if(this.scene){
+        this.scene.increaseScore();
+      }
+      this.die()
       
-    }else{
-    this.setValue (this.healthBar, this.health*10*3)}
+    } else{
+      this.setValue (this.healthBar, this.health*10*3)
+    }
+
   }
 
   setVelocity(x,y){
@@ -126,50 +140,58 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
     this.setVelocityY(y);
   }
   update(time,delta){
-    console.log(delta)
-    let dirX =this.player.x-this.x
-    let dirY = this.player.y-this.y
-    let magnitude = Math.sqrt(dirX*dirX + dirY*dirY);
-    let normalizedX = dirX/magnitude
-    let normalizedY = dirY/magnitude
-
-
-    this.healthBar.x = this.x -10
-    this.healthBar.y = this.y +20
-    if(this.freezetimertimer> 3){
-      this.freeze = false
-      }
-    if(magnitude > 150){
-      
-
-      
-    if(!this.freeze){
-      this.setVelocityX(normalizedX * this.speed)
-      this.setVelocityY(normalizedY * this.speed)
-     }
-    }
-    if(magnitude < 800){
-    var offset = 100
-    var chunk = this.scene.getChunkAtPos(Math.floor(this.x + normalizedX*offset),Math.floor(this.y+normalizedY*offset))
-      let ontiletype = chunk.getTileAtWorldPosition(this.x,this.y)
-
-      if(ontiletype && !this.freeze){
-        if(ontiletype == 'sprGrass' || ontiletype == 'sprSand'){
-          
-          this.vel = this.body.velocity
-          this.setVelocity(-this.vel.x,-this.vel.y)
-          this.freezetimer = 0;
-          this.freeze = true;
-        }
-      }
-
-
-      this.lastposx = this.x
-      this.lastposy = this.y
-      this.freezetimer += delta;
-  }
-
+    if(!this.isdead){
+      let dirX =this.player.x-this.x
+      let dirY = this.player.y-this.y
+      let magnitude = Math.sqrt(dirX*dirX + dirY*dirY);
+      let normalizedX = dirX/magnitude
+      let normalizedY = dirY/magnitude
   
-  //TODO : Death animation 
+  
+      this.healthBar.x = this.x -10
+      this.healthBar.y = this.y +20
+      if(this.freezetimer > 1500){
+        this.freeze = false
+        }
+      if(magnitude > 120){
+        
+      if(!this.freeze){
+        this.setVelocityX(normalizedX * this.speed)
+        this.setVelocityY(normalizedY * this.speed)
+       }
+      }
+
+      if(magnitude < 5000){
+  
+        
+        var dV = this.body.velocity
+        let dMagnitude = Math.sqrt(dV.x*dV.x + dV.y+dV.y)
+        var dx = dV.x/dMagnitude
+        var dy = dV.y/dMagnitude     // normalize the vector
+  
+        var offset = 32
+        var chunk = this.scene.getChunkAtPos(Math.floor(this.x + dx*offset),Math.floor(this.y+dy*offset))
+        let ontiletype = chunk.getTileAtWorldPosition(this.x + dx*offset,this.y+dy*offset)
+      
+        
+
+        if(ontiletype && !this.freeze){
+          if(ontiletype == 'sprGrass' || ontiletype == 'sprSand' || !this.checkTile()){
+            
+            this.vel = this.body.velocity
+            this.setVelocity(-this.vel.x,-this.vel.y)
+            this.freezetimer = 0;
+            this.freeze = true;
+          }
+        }
+  
+  
+        this.freezetimer += delta;
+      }
+  
+    
+    }
+   
+
   }
 }

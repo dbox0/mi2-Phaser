@@ -28,8 +28,7 @@ class Chunk {
       const chunkOffsetY = this.y * this.scene.chunkSize * this.scene.tileSize;
       const localX = Math.floor((worldX - (this.x * this.scene.chunkSize * this.scene.tileSize)) / this.scene.tileSize);
       const localY = Math.floor((worldY - (this.y * this.scene.chunkSize * this.scene.tileSize)) / this.scene.tileSize)
-      const X = Math.round(worldX)
-      const Y = Math.round(worldY)
+
 
 
      // console.log(worldX,worldY,localX,localY, "BLAS");

@@ -27,7 +27,7 @@ class MenueScene extends Phaser.Scene {
         const { width, height } = this.scale
 
 
-        let button = this.add.image(100, 100, 'button');
+        let button = this.add.image(40000, 100, 'button1');
         button.setInteractive();
 
         let music = this.sound.add('backgroundmusic');

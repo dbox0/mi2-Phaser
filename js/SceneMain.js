@@ -64,8 +64,8 @@ class SceneMain extends Phaser.Scene {
       this.scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#fff' });
       this.scoreText.setDepth (4);
 
-      this.health = 5;
-
+      this.health = 2;
+      this.maxhealth = this.health
       // Health bar
       this.healthBar=this.makeBar(140,100,0x2ecc71);
  
@@ -95,11 +95,6 @@ class SceneMain extends Phaser.Scene {
         classType: Projectile,
         runChildUpdate: true
     });
-
-
-  
-
-
       this.enemies = this.physics.add.group({
         classType: Enemy,
         runChildUpdate: true
@@ -126,7 +121,10 @@ class SceneMain extends Phaser.Scene {
       this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
       this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
       this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+
+      // player init
       this.ship = this.physics.add.sprite( this.cameras.main.worldView.x,this.cameras.main.worldView.y,'ship');
+
 
       this.input.setDefaultCursor('url(content/sprites/crosshair.png), pointer');
 
@@ -171,8 +169,8 @@ class SceneMain extends Phaser.Scene {
 
         const chunkAt = this.getChunkAtPos(worldX,worldY);
        // var particle  = new Projectile(this,worldX,worldY,"playerproj",0,0,0)
-        console.log("Clicked chunk is at " + chunkAt.x,chunkAt.y);
-        console.log(this.getTileType(worldX,worldY,chunkAt,this.chunkSize,this.tileSize))
+        //console.log("Clicked chunk is at " + chunkAt.x,chunkAt.y);
+        //console.log(this.getTileType(worldX,worldY,chunkAt,this.chunkSize,this.tileSize))
         // Log the coordinates to the console
         //console.log('Pointer down at:', worldX, worldY);
         let dirX = worldX - this.ship.x;
@@ -185,8 +183,13 @@ class SceneMain extends Phaser.Scene {
         const b = dirY/normalized;
         console.log("B: " + b)
         if(!this.gameEnded){
+          
           var projectile = new Projectile(this,this.ship.x ,this.ship.y,"playerproj",a,b,100)
-          projectile.setDepth(2);
+          //let projectileA = this.projectile.get(this,this.ship.x ,this.ship.y,"playerproj",a,b,100);
+          if(projectile){
+            projectile.setDepth(2);
+          }
+          //projectile.setDepth(2);
           this.projectiles.add(projectile);
         }
        
@@ -211,11 +214,21 @@ class SceneMain extends Phaser.Scene {
 
   handlePlayerOnHit(player, projectile,){
     //console.log(projectile)
+    this.playerTakeDamage()
     projectile.deactivate();
-    this.takeDamage()
-  }
+    if(!this.gameEnded){
+
+      
+      let vel = this.ship.body.velocity;
+      if(!this.gameEnded){
+        player.setVelocityX(-vel.x* 1.25)
+        player.setVelocityY(-vel.y *1.25)  
+      }
+    }
+    
+    }
   
-  takeDamage(){
+  playerTakeDamage(){
     //console.log("OUCH WATCH WHERE YER SAILIN ARRRR")
     if(this.health > 0){
     this.health -= 1;
@@ -314,7 +327,6 @@ getTileType(worldX, worldY, chunk, chunksize, tilesize) {
     
     update() {
       
-     
       var snappedChunkX = (this.chunkSize * this.tileSize) * Math.round(this.ship.x / (this.chunkSize * this.tileSize));
       var snappedChunkY = (this.chunkSize * this.tileSize) * Math.round(this.ship.y / (this.chunkSize * this.tileSize));
   
@@ -376,7 +388,7 @@ getTileType(worldX, worldY, chunk, chunksize, tilesize) {
 
       var chunk = this.getChunkAtPos(this.ship.x,this.ship.y);
       let ontiletype = chunk.getTileAtWorldPosition(this.ship.x,this.ship.y)
-      console.log(ontiletype)
+      //console.log(ontiletype)
 
       if(ontiletype){
         if(ontiletype == 'sprGrass' || ontiletype == 'sprSand'){
