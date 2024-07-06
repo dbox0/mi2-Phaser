@@ -19,9 +19,9 @@ class MenueScene extends Phaser.Scene {
     create() {
 
         let image = this.add.image(0, 0, 'background');
-            image.setOrigin(0, 0);
-            image.displayWidth = this.sys.game.config.width;
-            image.displayHeight = this.sys.game.config.height;
+        image.setOrigin(0, 0);
+        image.displayWidth = this.sys.game.config.width;
+        image.displayHeight = this.sys.game.config.height;
 
         console.log("Entered Main Menu")
         const { width, height } = this.scale
@@ -31,38 +31,38 @@ class MenueScene extends Phaser.Scene {
         button.setInteractive();
 
         let music = this.sound.add('backgroundmusic');
-            music.setVolume(0.1);
-            music.setLoop(true);
-            music.play();
+        music.setVolume(0.1);
+        music.setLoop(true);
+        music.play();
 
-            button.on('pointerdown', function () {
-                if (musik.isPlaying) {
-                    musik.pause();
-                } else {
-                    musik.resume();
-                }
-            });    
+        button.on('pointerdown', function () {
+            if (musik.isPlaying) {
+                musik.pause();
+            } else {
+                musik.resume();
+            }
+        });
 
         // Play button Erstellen
         const playButton = this.add.image(width * 0.5, height * 0.6, 'button1')
             .setDisplaySize(150, 50)
             .setInteractive() // Button interaktiv machen
-        
+
         this.add.text(playButton.x, playButton.y, 'Play')
             .setOrigin(0.5)
 
 
-            playButton.on('pointerdown', () => {
-                this.confirmSelection()
-            })
-    
-            playButton.on('pointerover', () => {
-                this.selectButton(this.buttons.indexOf(playButton))
-            })
-    
-            playButton.on('pointerout', () => {
-                this.selectButton(this.selectedButtonIndex)
-            })
+        playButton.on('pointerdown', () => {
+            this.confirmSelection()
+        })
+
+        playButton.on('pointerover', () => {
+            this.selectButton(this.buttons.indexOf(playButton))
+        })
+
+        playButton.on('pointerout', () => {
+            this.selectButton(this.selectedButtonIndex)
+        })
 
 
 
@@ -75,18 +75,18 @@ class MenueScene extends Phaser.Scene {
             .setOrigin(0.5)
 
 
-            How2PlayButton.on('pointerdown', () => {
-                this.confirmSelection()
-            })
-    
-            How2PlayButton.on('pointerover', () => {
-                this.selectButton(this.buttons.indexOf(How2PlayButton))
-            })
-    
-            How2PlayButton.on('pointerout', () => {
-                this.selectButton(this.selectedButtonIndex)
-            })
-    
+        How2PlayButton.on('pointerdown', () => {
+            this.confirmSelection()
+        })
+
+        How2PlayButton.on('pointerover', () => {
+            this.selectButton(this.buttons.indexOf(How2PlayButton))
+        })
+
+        How2PlayButton.on('pointerout', () => {
+            this.selectButton(this.selectedButtonIndex)
+        })
+
 
         // Credits button Erstellen 
         const CreditsButton = this.add.image(How2PlayButton.x, How2PlayButton.y + How2PlayButton.displayHeight + 10, 'button1')
@@ -96,18 +96,18 @@ class MenueScene extends Phaser.Scene {
         this.add.text(CreditsButton.x, CreditsButton.y, 'Credits')
             .setOrigin(0.5)
 
-            CreditsButton.on('pointerdown', () => {
-                this.confirmSelection()
-            })
-    
-            CreditsButton.on('pointerover', () => {
-                this.selectButton(this.buttons.indexOf(CreditsButton))
-            })
-    
-            CreditsButton.on('pointerout', () => {
-                this.selectButton(this.selectedButtonIndex)
-            })
-            
+        CreditsButton.on('pointerdown', () => {
+            this.confirmSelection()
+        })
+
+        CreditsButton.on('pointerover', () => {
+            this.selectButton(this.buttons.indexOf(CreditsButton))
+        })
+
+        CreditsButton.on('pointerout', () => {
+            this.selectButton(this.selectedButtonIndex)
+        })
+
 
         // Store buttons in an array
         this.buttons.push(playButton)
@@ -115,7 +115,7 @@ class MenueScene extends Phaser.Scene {
         this.buttons.push(CreditsButton)
 
         // Initialize button selector
-    
+
 
         // Select the initial button
         this.selectButton(0)
@@ -127,18 +127,18 @@ class MenueScene extends Phaser.Scene {
         this.input.setDefaultCursor('url(content/ui/cursorGauntlet_grey.png), pointer');
         //this.cursor.setScale(0.5); // Größe des Cursors anpassen
 
-        
-            /*
-        this.input.on('pointermove', (pointer) => {
-            this.cursors.setPosition(pointer.x, pointer.y)
-        })*/
+
+        /*
+    this.input.on('pointermove', (pointer) => {
+        this.cursors.setPosition(pointer.x, pointer.y)
+    })*/
     }
 
     update() {
         const upJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.up)
         const downJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.down)
         const spaceJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.space)
-        
+
         if (upJustPressed) {
             this.selectNextButton(-1)
         } else if (downJustPressed) {
@@ -193,6 +193,6 @@ class MenueScene extends Phaser.Scene {
             default:
                 break;
 
-        }        
-    }    
+        }
+    }
 }

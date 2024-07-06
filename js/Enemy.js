@@ -1,36 +1,39 @@
 
-class Enemy extends Phaser.Physics.Arcade.Sprite{
+class Enemy extends Phaser.Physics.Arcade.Sprite {
 
-  constructor(scene, x, y, texture, player ){
-    super(scene,x,y,texture);
+  constructor(scene, x, y, texture, player, debug) {
+    super(scene, x, y, texture);
     this.player = player;
     this.freeze = false;
+    this.accepted = false;
+
 
     scene.physics.world.enable(this);
     this.scene.add.existing(this);
 
-    let dirX =this.player.x-this.x
-    let dirY = this.player.y-this.y
-    let magnitude = Math.sqrt(dirX*dirX + dirY*dirY);
-    
-    let vectorx = dirX/magnitude;
-    let vectory = dirY/magnitude
+    let dirX = this.player.x - this.x
+    let dirY = this.player.y - this.y
+    let magnitude = Math.sqrt(dirX * dirX + dirY * dirY);
+
+    let vectorx = dirX / magnitude;
+    let vectory = dirY / magnitude
 
 
-    this.x += vectorx *128
-    this.y += vectory*128
+    this.x += vectorx * 128
+    this.y += vectory * 128
+    let vec = new Phaser.Math.Vector2(dirX, dirY)
 
 
- 
+
     //console.log(this.player.x)
     //console.log(this.player.y)
 
-    this.healthBar=this.makeBar(3,2,0x911c1e);
-    this.setValue(this.healthBar,100);
-    this.healthBar.setDepth ( 1 );  
+    this.healthBar = this.makeBar(3, 2, 0x911c1e);
+    this.setValue(this.healthBar, 100);
+    this.healthBar.setDepth(1);
 
     this.firerate = 2000; // fire every 2 seconds
-  
+
     this.isdead = false;
     this.health = 3;
     this.maxhealth = this.health;
@@ -39,8 +42,8 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
     this.setDepth(1);
     this.attackspeed = 100;
     this.speed = 20;
-    
-    this.rand = Math.random()*1000
+
+    this.rand = Math.random() * 1000
     this.scene.time.addEvent({
 
       delay: (this.firerate + this.rand),
@@ -49,11 +52,12 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
       loop: true
     });
 
-    if(!this.checkTile){
-      this.die();
-    }
 
-  
+
+
+
+
+
   }
   checkTile() {
     var chunk = this.scene.getChunkAtPos(this.x, this.y);
@@ -62,7 +66,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
     }
   }
 
-  makeBar(x, y,color) {
+  makeBar(x, y, color) {
     //draw the bar
     let bar = this.scene.add.graphics();
 
@@ -71,7 +75,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
 
     //fill the bar with a rectangle
     bar.fillRect(0, 0, 30, 5);
-    
+
     //position the bar
     bar.x = x;
     bar.y = y;
@@ -81,7 +85,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
   }
 
 
-  die(){
+  die() {
     console.log("Died")
     this.isdead = true;
     if (this.body) {
@@ -94,104 +98,149 @@ class Enemy extends Phaser.Physics.Arcade.Sprite{
     this.destroy();
   }
 
-  setValue(bar,percentage) {
+  setValue(bar, percentage) {
     //scale the bar
-    bar.scaleX = percentage/100;
-}
+    bar.scaleX = percentage / 100;
+  }
 
-  fireProjectile(){
+  fireProjectile() {
 
-    if(!this.isdead){
-//console.log(this.player);
-    var dirx = this.player.x - this.x;
-    //console.log(this.player.y - this.y)
-    
-    let distanceVector = [this.x - this.player.x,this.y - this.player.y];
-    const distance = Math.sqrt(distanceVector[0]*distanceVector[0]+distanceVector[1]*distanceVector[1]);
-    if(distance < 300){
-      var diry = this.player.y - this.y;
-      var projectile = new Projectile(this.scene,this.x,this.y,"projectile",dirx,diry,this.attackspeed,true)
-      this.scene.enemyprojectiles.add(projectile);
-      projectile.setDepth(1);
-      
+    if (!this.isdead && !this.scene.gameEnded) {
+      //console.log(this.player);
+      var dirx = this.player.x - this.x;
+      //console.log(this.player.y - this.y)
+
+      let distanceVector = [this.x - this.player.x, this.y - this.player.y];
+      const distance = Math.sqrt(distanceVector[0] * distanceVector[0] + distanceVector[1] * distanceVector[1]);
+      if (distance < 300) {
+        var diry = this.player.y - this.y;
+        var projectile = new Projectile(this.scene, this.x, this.y, "projectile", dirx, diry, this.attackspeed, true)
+        this.scene.enemyprojectiles.add(projectile);
+        projectile.setDepth(1);
+
       }
     }
-    
-    
-    }
-  
-  takeDamage(){
+
+
+  }
+
+  takeDamage() {
     this.health -= 1;
-    if(this.health <= 0){
+    if (this.health <= 0) {
       // play death anim () function
-      if(this.scene){
+      if (this.scene) {
         this.scene.increaseScore();
       }
+      this.scene.enemiecount--;
       this.die()
-      
-    } else{
-      this.setValue (this.healthBar, this.health*10*3)
+
+    } else {
+      this.setValue(this.healthBar, this.health * 10 * 3)
     }
 
   }
 
-  setVelocity(x,y){
+  setVelocity(x, y) {
     this.setVelocityX(x);
     this.setVelocityY(y);
   }
-  update(time,delta){
-    if(!this.isdead){
-      let dirX =this.player.x-this.x
-      let dirY = this.player.y-this.y
-      let magnitude = Math.sqrt(dirX*dirX + dirY*dirY);
-      let normalizedX = dirX/magnitude
-      let normalizedY = dirY/magnitude
-  
-  
-      this.healthBar.x = this.x -10
-      this.healthBar.y = this.y +20
-      if(this.freezetimer > 1500){
-        this.freeze = false
-        }
-      if(magnitude > 120){
-        
-      if(!this.freeze){
-        this.setVelocityX(normalizedX * this.speed)
-        this.setVelocityY(normalizedY * this.speed)
-       }
-      }
 
-      if(magnitude < 5000){
-  
-        
-        var dV = this.body.velocity
-        let dMagnitude = Math.sqrt(dV.x*dV.x + dV.y+dV.y)
-        var dx = dV.x/dMagnitude
-        var dy = dV.y/dMagnitude     // normalize the vector
-  
-        var offset = 32
-        var chunk = this.scene.getChunkAtPos(Math.floor(this.x + dx*offset),Math.floor(this.y+dy*offset))
-        let ontiletype = chunk.getTileAtWorldPosition(this.x + dx*offset,this.y+dy*offset)
-      
-        
 
-        if(ontiletype && !this.freeze){
-          if(ontiletype == 'sprGrass' || ontiletype == 'sprSand' || !this.checkTile()){
-            
+  handleCollision(velocityNormalized) {
+
+
+    let offsets = [0, 16, 32, 64, 128]
+    for (var i = 0; i < offsets.length; i++) {
+      var chunk = this.scene.getChunkAtPos(this.x + velocityNormalized.x * offsets[i], this.y + velocityNormalized.y * offsets[i]);
+      //console.log(chunk.x, chunk.y)
+      if (chunk) {
+        let ontiletype = chunk.getTileAtWorldPosition(this.x + velocityNormalized.x * offsets[i], this.y + velocityNormalized.y * offsets[i])
+        //console.log(ontiletype)
+        if (ontiletype) {
+          //var particle = new Projectile(this.scene, this.x + velocityNormalized.x * offsets[i],this.y + velocityNormalized.y * offsets[i], 'a', 0, 0, 0, true, 100,true)
+          if (ontiletype == 'sprGrass' || ontiletype == 'sprSand') {
             this.vel = this.body.velocity
-            this.setVelocity(-this.vel.x,-this.vel.y)
-            this.freezetimer = 0;
-            this.freeze = true;
+            //this.ship.setVelocity(-this.vel.x, -this.vel.y)
+            //console.log("collision at offset " + i)
+            var particle = new Projectile(this.scene, this.x + velocityNormalized.x * offsets[i], this.y + velocityNormalized.y * offsets[i], 'a', 0, 0, 0, true, 100, true)
+            return true;
           }
         }
-  
-  
+      }
+
+
+
+    } return false;
+  }
+
+
+  update(time, delta) {
+    //hacky bullshit. Warum geht das nicht bei Erzeugung des Enemies??? Jetzt ist es in der Update-Methode :(
+    if (!this.tested) {
+
+      let dirX = this.player.x - this.x
+      let dirY = this.player.y - this.y
+      let distanceToPlayer = Math.sqrt(dirX * dirX + dirY * dirY);
+
+      if (!this.checkTile(this.x, this.y) || distanceToPlayer < 250 || this.handleCollision(new Phaser.Math.Vector2(dirX/distanceToPlayer,dirY/distanceToPlayer))) {
+        this.accepted = false;
+        this.tested = true
+        this.scene.enemiecount--;
+        this.die();
+      } else { 
+        
+        let dirX = this.player.x - this.x
+        let dirY = this.player.y - this.y
+
+        this.tested = true;
+      }
+    }
+    if (!this.isdead) {
+
+
+
+      let dirX = this.player.x - this.x
+      let dirY = this.player.y - this.y
+      let distanceToPlayer = Math.sqrt(dirX * dirX + dirY * dirY);
+
+      let xToPlayer = dirX / distanceToPlayer
+      let yToPlayer = dirY / distanceToPlayer
+
+
+      this.healthBar.x = this.x - 10
+      this.healthBar.y = this.y + 20
+
+      if (this.freezetimer > 3000) {
+        this.freeze = false
+        this.freeze = 0;
+      }
+
+      let dV = new Phaser.Math.Vector2(this.body.velocity)
+      let dV2 = dV
+
+      if (!this.freeze) {
+        this.setVelocityX(xToPlayer * this.speed)
+        this.setVelocityY(yToPlayer * this.speed)
+        if (this.handleCollision(dV.normalize())) {
+          this.freeze = true;
+          this.freezetimer = 0;
+          if (Math.abs(dV2.x > dV2.y)) {
+            this.body.setVelocityX(-dV2.x * 10)
+          } else {
+            this.body.setVelocityY(-dV2.y * 10)
+          }
+
+        }
+      }
+      if (this.freeze) {
         this.freezetimer += delta;
       }
-  
-    
+      if (distanceToPlayer > 900) {
+        console.log("I should die")
+        this.die()
+      }
     }
-   
+
 
   }
 }
