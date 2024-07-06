@@ -58,7 +58,7 @@ class Chunk {
         for (let localY = -8; localY <= 7; localY++) {
           const tileX = (this.x * this.scene.chunkSize * this.scene.tileSize) + (localX * this.scene.tileSize);
           const tileY = (this.y * this.scene.chunkSize * this.scene.tileSize) + (localY * this.scene.tileSize);
-          const perlinValue = noise.perlin2( tileX / 333, tileY /333);
+          const perlinValue = noise.perlin2( tileX / 320, tileY /312);
 
           let key = "";
           let animationKey = "";

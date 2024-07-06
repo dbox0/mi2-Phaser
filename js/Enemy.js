@@ -146,11 +146,17 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
 
-  handleCollision(velocityNormalized) {
+  handleCollision(velocityNormalized , depth) {
 
 
     let offsets = [0, 16, 32, 64, 128]
-    for (var i = 0; i < offsets.length; i++) {
+    let iterateTo = -1
+    if(depth){
+      iterateTo = depth
+    } else {
+      iterateTo = offsets.length
+    }
+    for (var i = 0; i < iterateTo; i++) {
       var chunk = this.scene.getChunkAtPos(this.x + velocityNormalized.x * offsets[i], this.y + velocityNormalized.y * offsets[i]);
       //console.log(chunk.x, chunk.y)
       if (chunk) {
@@ -182,7 +188,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
       let dirY = this.player.y - this.y
       let distanceToPlayer = Math.sqrt(dirX * dirX + dirY * dirY);
 
-      if (!this.checkTile(this.x, this.y) || distanceToPlayer < 250 || this.handleCollision(new Phaser.Math.Vector2(dirX/distanceToPlayer,dirY/distanceToPlayer))) {
+      if (!this.checkTile(this.x, this.y) || distanceToPlayer < 250 || this.handleCollision(new Phaser.Math.Vector2(dirX/distanceToPlayer,dirY/distanceToPlayer),3)) {
         this.accepted = false;
         this.tested = true
         this.scene.enemiecount--;
