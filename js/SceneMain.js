@@ -62,7 +62,7 @@ class SceneMain extends Phaser.Scene {
 
     this.enemienumbercoefficient = 1;
     this.enemiecount = 0;
-    this.maxEnemies = 40;
+    this.maxEnemies = 20;
     this.gameOverText = this.add.text(16, 16, 'GAME OVER', { fontSize: '32px', fill: '#f00' });
     this.gameOverText.setDepth(3);
     this.gameOverText.setVisible(false)
@@ -155,15 +155,6 @@ class SceneMain extends Phaser.Scene {
 
     this.vel = null
 
-
-    this.time.addEvent(
-      {
-        delay: 1000,
-        callback: this.printplayer,
-        callbackScope: this,
-        loop: true
-      }
-    )
 
     // GET MOUSECLICK to shoot
     this.input.on('pointerdown', function (pointer) {

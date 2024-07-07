@@ -113,20 +113,21 @@ class Tile extends Phaser.GameObjects.Sprite {
     if (keyframe !== "") {
       this.play(keyframe)
     }
+
+    if(spawner){
     this.scene.time.addEvent(
       {
-        delay: 15000,
+        delay: 1000,
         callback: this.spawn(this.scene),
         callbackscope: this,
         loop: true,
       }
-
     )
   }
+  }
   spawn(scene) {
-    if (this.spawner) {
       scene.spawnEnemy(this.x, this.y)
-    }
+
   }
 
 

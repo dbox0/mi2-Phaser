@@ -21,6 +21,14 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     this.x += vectorx * 128
     this.y += vectory * 128
+
+
+    var newxy = this.scene.findClosestWaterTile(this.x,this.y)
+    var vectorD = new Phaser.Math.Vector2(newxy.x - this.x,newxy.y - this.y);
+    vectorD.normalize()
+    this.x = this.x  + vectorD.x*64
+    this.y = this.y +  vectorD.y*64   
+    
     let vec = new Phaser.Math.Vector2(dirX, dirY)
 
 
@@ -87,6 +95,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   die() {
     console.log("Died")
+    this.scene.enemiecount--;
     this.isdead = true;
     if (this.body) {
       this.body.setEnable(false); // Disable physics body
@@ -131,7 +140,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
       if (this.scene) {
         this.scene.increaseScore();
       }
-      this.scene.enemiecount--;
+      
       this.die()
 
     } else {
@@ -188,10 +197,9 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
       let dirY = this.player.y - this.y
       let distanceToPlayer = Math.sqrt(dirX * dirX + dirY * dirY);
 
-      if (!this.checkTile(this.x, this.y) || distanceToPlayer < 250 || this.handleCollision(new Phaser.Math.Vector2(dirX/distanceToPlayer,dirY/distanceToPlayer),3)) {
+      if ( distanceToPlayer < 200) {
         this.accepted = false;
         this.tested = true
-        this.scene.enemiecount--;
         this.die();
       } else { 
         
@@ -246,7 +254,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
       if (this.freeze) {
         this.freezetimer += delta;
       }
-      if (distanceToPlayer > 900) {
+      if (distanceToPlayer > 700) {
         console.log("I should die")
         this.die()
       }
