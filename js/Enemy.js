@@ -231,9 +231,9 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
           this.freeze = true;
           this.freezetimer = 0;
           if (Math.abs(dV2.x > dV2.y)) {
-            this.body.setVelocityX(-dV2.x * 10)
+            this.body.setVelocityX(-dV2.x * 20)
           } else {
-            this.body.setVelocityY(-dV2.y * 10)
+            this.body.setVelocityY(-dV2.y * 20)
           }
 
         }

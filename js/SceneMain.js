@@ -244,6 +244,38 @@ class SceneMain extends Phaser.Scene {
 
   }
 
+  findClosestWaterTile(posX, posY) {
+    const searchRadius = 256; // Example search radius, adjust as needed
+    const tileSize = this.tileSize; // Your tile size
+    const chunkSize = this.chunkSize; // Your chunk size
+
+    let closestWaterTile = null;
+    let shortestDistance = Infinity;
+
+    // Define the search area
+    const startX = posX - searchRadius;
+    const endX = posX + searchRadius;
+    const startY = posY - searchRadius;
+    const endY = posY + searchRadius;
+
+    for (let x = startX; x <= endX; x += tileSize) {
+      for (let y = startY; y <= endY; y += tileSize) {
+        const chunk = this.getChunkAtPos(x, y);
+        if (chunk) {
+          const tileType = chunk.getTileAtWorldPosition(x, y);
+          if (tileType === 'sprWater') {
+            const distance = Phaser.Math.Distance.Between(posX, posY, x, y);
+            if (distance < shortestDistance) {
+              shortestDistance = distance;
+              closestWaterTile = { x, y };
+            }
+          }
+        }
+      }
+    }
+
+    let proj = new Projectile(this,closestWaterTile.x,closestWaterTile.y,"a",0,0,0,false,100,true);
+  }
   playerTakeDamage() {
     //console.log("OUCH WATCH WHERE YER SAILIN ARRRR")
     this.health -= 1;
@@ -418,7 +450,7 @@ class SceneMain extends Phaser.Scene {
           this.vel = this.ship.body.velocity
           //this.ship.setVelocity(-this.vel.x, -this.vel.y)
           console.log("STUCK")
-          var particle = new Projectile(this, this.ship.x,this.ship.y, 'a', 0, 0, 0, true, 100,true)
+          //var particle = new Projectile(this, this.ship.x,this.ship.y, 'a', 0, 0, 0, true, 100,true)
         }
       }
       //console.log(chunk.x,chunk.y,"  ",);
@@ -427,9 +459,11 @@ class SceneMain extends Phaser.Scene {
       this.healthBar.y = this.ship.y + 20
     }
 
+    this.findClosestWaterTile(this.ship.x,this.ship.y)
+
     this.mousePosX = game.input.mousePointer.x;
     this.mousePosY = game.input.mousePointer.y;
-    // console.log(this.mousePosX,this.mousePosY)
+    console.log(this.mousePosX,this.mousePosY)
     if (this.ship) {
       this.cameras.main.centerOn(this.ship.x, this.ship.y);
     }

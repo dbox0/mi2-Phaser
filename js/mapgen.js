@@ -71,7 +71,7 @@ class Chunk {
           } else if (perlinValue >= 0.2 && perlinValue < 0.3033) {
             key = "sprSand";
             water = false;
-          } else if (perlinValue >= 0.3037 && perlinValue < 0.31) {
+          } else if (perlinValue >= 0.3033 && perlinValue < 0.31) {
             key = "sprHouse";
             spawner = true;
           } else if (perlinValue >= 0.31) {
