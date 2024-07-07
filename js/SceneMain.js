@@ -273,8 +273,8 @@ class SceneMain extends Phaser.Scene {
         }
       }
     }
-
-    let proj = new Projectile(this,closestWaterTile.x,closestWaterTile.y,"a",0,0,0,false,100,true);
+    //let proj = new Projectile(this,closestWaterTile.x,closestWaterTile.y,"a",0,0,0,false,100,true);
+    return closestWaterTile
   }
   playerTakeDamage() {
     //console.log("OUCH WATCH WHERE YER SAILIN ARRRR")
@@ -463,7 +463,7 @@ class SceneMain extends Phaser.Scene {
 
     this.mousePosX = game.input.mousePointer.x;
     this.mousePosY = game.input.mousePointer.y;
-    console.log(this.mousePosX,this.mousePosY)
+   
     if (this.ship) {
       this.cameras.main.centerOn(this.ship.x, this.ship.y);
     }

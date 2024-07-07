@@ -149,7 +149,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
   handleCollision(velocityNormalized , depth) {
 
 
-    let offsets = [0, 16, 32, 64, 128]
+    let offsets = [0, 16, 32, 64]
     let iterateTo = -1
     if(depth){
       iterateTo = depth
@@ -216,7 +216,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
       this.healthBar.x = this.x - 10
       this.healthBar.y = this.y + 20
 
-      if (this.freezetimer > 3000) {
+      if (this.freezetimer > 750) {
         this.freeze = false
         this.freeze = 0;
       }
@@ -230,11 +230,16 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         if (this.handleCollision(dV.normalize())) {
           this.freeze = true;
           this.freezetimer = 0;
-          if (Math.abs(dV2.x > dV2.y)) {
-            this.body.setVelocityX(-dV2.x * 20)
-          } else {
-            this.body.setVelocityY(-dV2.y * 20)
-          }
+         
+          var newpath = this.scene.findClosestWaterTile(this.x,this.y);
+          var newdir = new Phaser.Math.Vector2(newpath.x - this.x, newpath.y - this.y);
+          var velmagnitude = this.body.velocity.normalize();
+         
+          newdir.normalize();
+         
+          this.setVelocityX(newdir.x*this.speed);
+          this.setVelocityY(newdir.y*this.speed)
+
 
         }
       }
