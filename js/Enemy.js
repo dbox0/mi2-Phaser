@@ -40,8 +40,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.setValue(this.healthBar, 100);
     this.healthBar.setDepth(1);
 
-    this.firerate = 2000; // fire every 2 seconds
-
+    this.firerate = 1800; // 1000 = 1
     this.isdead = false;
     this.health = 3;
     this.maxhealth = this.health;
@@ -116,13 +115,15 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     if (!this.isdead && !this.scene.gameEnded) {
       //console.log(this.player);
-      var dirx = this.player.x - this.x;
+   
       //console.log(this.player.y - this.y)
 
       let distanceVector = [this.x - this.player.x, this.y - this.player.y];
-      const distance = Math.sqrt(distanceVector[0] * distanceVector[0] + distanceVector[1] * distanceVector[1]);
+      const distance = Math.sqrt(distanceVector[0] * distanceVector[0] + distanceVector[1] * distanceVector[1])
       if (distance < 300) {
-        var diry = this.player.y - this.y;
+        let predictionTime = Math.random() * 4
+        var dirx =  (this.player.x + this.player.body.velocity.x * predictionTime) - this.x;
+        var diry = (this.player.y + this.player.body.velocity.y * predictionTime) - this.y;
         var projectile = new Projectile(this.scene, this.x, this.y, "projectile", dirx, diry, this.attackspeed, true)
         this.scene.enemyprojectiles.add(projectile);
         projectile.setDepth(1);
@@ -158,7 +159,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
   handleCollision(velocityNormalized , depth) {
 
 
-    let offsets = [0, 16, 32, 64]
+    let offsets = [0, 16, 32, 64,128]
     let iterateTo = -1
     if(depth){
       iterateTo = depth
@@ -177,7 +178,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
             this.vel = this.body.velocity
             //this.ship.setVelocity(-this.vel.x, -this.vel.y)
             //console.log("collision at offset " + i)
-            var particle = new Projectile(this.scene, this.x + velocityNormalized.x * offsets[i], this.y + velocityNormalized.y * offsets[i], 'a', 0, 0, 0, true, 100, true)
+            //var particle = new Projectile(this.scene, this.x + velocityNormalized.x * offsets[i], this.y + velocityNormalized.y * offsets[i], 'a', 0, 0, 0, true, 100, true)
             return true;
           }
         }
@@ -232,9 +233,12 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
       let dV = new Phaser.Math.Vector2(this.body.velocity)
       let dV2 = dV
 
-      if (!this.freeze) {
-        this.setVelocityX(xToPlayer * this.speed)
-        this.setVelocityY(yToPlayer * this.speed)
+      if (!this.freeze) { 
+        if(distanceToPlayer > 200){
+
+          this.setVelocityX(xToPlayer * this.speed)
+          this.setVelocityY(yToPlayer * this.speed)
+        }
         if (this.handleCollision(dV.normalize())) {
           this.freeze = true;
           this.freezetimer = 0;

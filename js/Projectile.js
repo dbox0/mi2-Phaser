@@ -19,7 +19,7 @@ class Projectile extends Phaser.Physics.Arcade.Sprite {
     this.setDepth(1);
 
     if (!enemy) {
-      this.lifespan += 400;
+      this.lifespan += 100;
     }
     if (lifetime) {
       this.lifespan = lifetime
