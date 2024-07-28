@@ -127,7 +127,6 @@ class Tile extends Phaser.GameObjects.Sprite {
   }
   spawn(scene) {
       scene.spawnEnemy(this.x, this.y)
-
   }
 
 

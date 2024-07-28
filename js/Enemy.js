@@ -122,8 +122,12 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
       const distance = Math.sqrt(distanceVector[0] * distanceVector[0] + distanceVector[1] * distanceVector[1])
       if (distance < 300) {
         let predictionTime = Math.random() * 4
-        var dirx =  (this.player.x + this.player.body.velocity.x * predictionTime) - this.x;
-        var diry = (this.player.y + this.player.body.velocity.y * predictionTime) - this.y;
+        var invert = 1
+        if(Math.random() > 0.6){
+          invert = -1;
+        }
+        var dirx =  (this.player.x + this.player.body.velocity.x *invert* predictionTime) - this.x;
+        var diry = (this.player.y + this.player.body.velocity.y *invert* predictionTime) - this.y;
         var projectile = new Projectile(this.scene, this.x, this.y, "projectile", dirx, diry, this.attackspeed, true)
         this.scene.enemyprojectiles.add(projectile);
         projectile.setDepth(1);
@@ -191,7 +195,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
 
   update(time, delta) {
-    //hacky bullshit. Warum geht das nicht bei Erzeugung des Enemies??? Jetzt ist es in der Update-Methode :(
+    // hacky bullshit. Warum geht das nicht bei Erzeugung des Enemies??? Jetzt ist es in der Update-Methode :(
     if (!this.tested) {
 
       let dirX = this.player.x - this.x

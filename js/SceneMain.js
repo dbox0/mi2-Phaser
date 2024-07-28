@@ -13,10 +13,11 @@ class SceneMain extends Phaser.Scene {
     this.load.image("sprSand", "content/sprites/sprSand.png");
     this.load.image("sprGrass", "content/sprites/sprGrass.png");
     this.load.image("sprHouse", "content/sprites/sprHouse.png");
-    this.load.image("ship", "content/sprites/shipplayerB.png");
-    this.load.image("enemy", "content/sprites/shiptest.png")
+    this.load.image("ship", "content/sprites/player.png");
+    this.load.image("enemy", "content/sprites/enemybig.png")
     this.load.image("projectile", "content/sprites/projectile.png")
     this.load.image("playerproj", "content/sprites/playerprojectile.png")
+
     this.load.audio('shot', 'content/sounds/enemycannonfire.mp3');
     this.load.audio('shotplayer', 'content/sounds/playercannonfire.mp3');
     this.load.audio('playerdmg', 'content/sounds/ownshipdemage.mp3')
