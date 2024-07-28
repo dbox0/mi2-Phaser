@@ -1,7 +1,7 @@
 
 class Enemy extends Phaser.Physics.Arcade.Sprite {
 
-  constructor(scene, x, y, texture, player, debug) {
+  constructor(scene, x, y, texture, player, hp , spawner) {
     super(scene, x, y, texture);
     this.player = player;
     this.freeze = false;
@@ -37,12 +37,20 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     //console.log(this.player.y)
 
     this.healthBar = this.makeBar(3, 2, 0x911c1e);
-    this.setValue(this.healthBar, 100);
+    this.setBarValue(this.healthBar, 100);
     this.healthBar.setDepth(1);
 
-    this.firerate = 1800; // 1000 = 1
+    this.firerate = 1800; // 1000 = 1 sec
     this.isdead = false;
-    this.health = 3;
+    this.yBaroffset = 10;
+    if(hp){
+      if(hp == 2){
+        this.yBaroffset = 0;
+      }
+      this.health = hp;
+    } else {
+      this.health = 3;
+    }
     this.maxhealth = this.health;
     this.scene = scene;
     this.texture = texture
@@ -59,11 +67,14 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
       loop: true
     });
 
-
-
-
-
-
+    if(spawner){
+      this.scene.time.addEvent({
+        delay: 10000,
+        callback : this.spawnboats,
+        callbackScope: this,
+        loop:true
+      })
+    }
 
   }
   checkTile() {
@@ -106,7 +117,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.destroy();
   }
 
-  setValue(bar, percentage) {
+  setBarValue(bar, percentage) {
     //scale the bar
     bar.scaleX = percentage / 100;
   }
@@ -149,7 +160,8 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
       this.die()
 
     } else {
-      this.setValue(this.healthBar, this.health * 10 * 3)
+      let percentage = this.health/this.maxhealth
+      this.setBarValue(this.healthBar, percentage*100)
     }
 
   }
@@ -226,10 +238,10 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
       let yToPlayer = dirY / distanceToPlayer
 
 
-      this.healthBar.x = this.x - 10
-      this.healthBar.y = this.y + 20
+      this.healthBar.x = this.x - 15
+      this.healthBar.y = this.y + 10 + this.yBaroffset
 
-      if (this.freezetimer > 750) {
+      if (this.freezetimer > 1250) {
         this.freeze = false
         this.freeze = 0;
       }

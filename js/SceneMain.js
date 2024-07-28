@@ -14,7 +14,12 @@ class SceneMain extends Phaser.Scene {
     this.load.image("sprGrass", "content/sprites/sprGrass.png");
     this.load.image("sprHouse", "content/sprites/sprHouse.png");
     this.load.image("ship", "content/sprites/player.png");
-    this.load.image("enemy", "content/sprites/enemybig.png")
+
+    this.load.image("enemysmall", "content/sprites/enemysmall.png")
+    this.load.image("enemy", "content/sprites/enemy.png")
+    this.load.image("enemybig", "content/sprites/enemybig.png")
+
+
     this.load.image("projectile", "content/sprites/projectile.png")
     this.load.image("playerproj", "content/sprites/playerprojectile.png")
 
@@ -63,7 +68,7 @@ class SceneMain extends Phaser.Scene {
 
     this.enemienumbercoefficient = 1;
     this.enemiecount = 0;
-    this.maxEnemies = 20;
+    this.maxEnemies = 18;
     this.gameOverText = this.add.text(16, 16, 'GAME OVER', { fontSize: '32px', fill: '#f00' });
     this.gameOverText.setDepth(3);
     this.gameOverText.setVisible(false)
@@ -178,7 +183,6 @@ class SceneMain extends Phaser.Scene {
       let dirY = worldY - this.ship.y;
       let normalized = Math.sqrt(dirX * dirX + dirY * dirY)
 
-
       const projX = dirX / normalized
       const projY = dirY / normalized;
       //console.log("B: " + b)
@@ -196,11 +200,11 @@ class SceneMain extends Phaser.Scene {
 
   }
 
-  shoot(projX, projY) {
-    var projectile = new Projectile(this, this.ship.x, this.ship.y, "playerproj", projX, projY, 100)
-    projectile.setDepth(2);
-    this.projectiles.add(projectile);
+  shootAt(){
+
   }
+
+
 
   increaseScore() {
     this.score += 1;
@@ -341,9 +345,52 @@ class SceneMain extends Phaser.Scene {
     return chunk;
   }
 
-  spawnEnemy(x, y,debug) {
+
+   
+  spawnEnemyAt(x,y){
+    var type = 0;
+    if(this.maxEnemies >= 25 || this.score > 20){
+      if(Math.random() > 0.25){
+        type = 2;
+      }
+      type = 1;
+    }
+    if(this.maxEnemies > 60){
+      if(Math.random() > 0.65){
+        type = 2;
+      }
+    }
+    this.spawnEnemy(x,y,type);
+  }
+
+  spawnEnemy(x, y,type) {
+ 
+    var texture = 'enemy';
+    var hp = 3;
+    var spawner = false;
+
+    switch(type){
+
+      case 0:
+        texture = 'enemysmall';
+        hp = 2;
+        break;
+      case 1:
+        texture = 'enemy';
+        hp = 4;
+        break;
+      case 2 : 
+        texture = 'enemybig';
+        spawner = true;
+        hp = 8;
+        break;
+    }
+
+    console.log(hp,spawner)
     if (this.enemiecount < this.maxEnemies) {
-      var enemy = this.enemies.create(x, y, 'enemy', this.ship);
+      let enemy = new Enemy(this, x, y, texture, this.ship, hp, spawner);
+      this.enemies.add(enemy);
+
       enemy.setDepth(1);
       this.enemiecount++;
       console.log("Enemies:" + this.enemiecount)
