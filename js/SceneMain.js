@@ -3,6 +3,9 @@
 class SceneMain extends Phaser.Scene {
   constructor() {
     super({ key: "SceneMain" });
+    this.shootingDelay = 1000;
+    this.pointer = {x: 0, y:0};
+    this.shootingEvent = null;
   }
 
   preload() {
@@ -25,8 +28,9 @@ class SceneMain extends Phaser.Scene {
 
     this.load.audio('shot', 'content/sounds/enemycannonfire.mp3');
     this.load.audio('shotplayer', 'content/sounds/playercannonfire.mp3');
-    this.load.audio('playerdmg', 'content/sounds/ownshipdemage.mp3')
-
+    this.load.audio('playerdmg', 'content/sounds/ownshipdemage.mp3');
+    this.load.audio('spawn','content/sounds/spawn.wav');
+    this.load.audio('gameover','content/sounds/gameover.mp3')
 
 
   }
@@ -61,6 +65,7 @@ class SceneMain extends Phaser.Scene {
   }
 
   create() {
+    this.playerprojnum = 2;
     this.tested = false;
     this.accepted = false;
     
@@ -68,7 +73,7 @@ class SceneMain extends Phaser.Scene {
 
     this.enemienumbercoefficient = 1;
     this.enemiecount = 0;
-    this.maxEnemies = 18;
+    this.maxEnemies = 7;
     this.gameOverText = this.add.text(16, 16, 'GAME OVER', { fontSize: '32px', fill: '#f00' });
     this.gameOverText.setDepth(3);
     this.gameOverText.setVisible(false)
@@ -161,50 +166,102 @@ class SceneMain extends Phaser.Scene {
 
     this.vel = null
 
+    this.input.on('pointermove', function (pointer) {
+      this.pointer.x = pointer.x;
+      this.pointer.y = pointer.y;
+    }, this);
+    
+ this.startShooting();
+  }
 
-    // GET MOUSECLICK to shoot
-    this.input.on('pointerdown', function (pointer) {
-      // Get the x and y coordinates of the pointer
-      const screenX = pointer.x;
-      const screenY = pointer.y;
+  startShooting() {
+    this.shootingEvent = this.time.addEvent({
+      delay: this.shootingDelay,
+      callback: this.shoot,
+      callbackScope: this,
+      loop: true
+    });
+  }
+
+  shoot() {
+    if (!this.gameEnded) {
+      const screenX = this.pointer.x;
+      const screenY = this.pointer.y;
       const playerX = this.ship.x;
       const playerY = this.ship.y;
-
+  
       const worldX = playerX + (screenX - this.cameras.main.centerX);
       const worldY = playerY + (screenY - this.cameras.main.centerY);
-
-      // const chunkAt = this.getChunkAtPos(worldX,worldY);
-      // var particle  = new Projectile(this,worldX,worldY,"playerproj",0,0,0)
-      //console.log("Clicked chunk is at " + chunkAt.x,chunkAt.y);
-      //console.log(this.getTileType(worldX,worldY,chunkAt,this.chunkSize,this.tileSize))
-      // Log the coordinates to the console
-      console.log('Pointer down at:', worldX, worldY);
+  
       let dirX = worldX - this.ship.x;
       let dirY = worldY - this.ship.y;
-      let normalized = Math.sqrt(dirX * dirX + dirY * dirY)
-
-      const projX = dirX / normalized
+      let normalized = Math.sqrt(dirX * dirX + dirY * dirY);
+  
+      const projX = dirX / normalized;
       const projY = dirY / normalized;
-      //console.log("B: " + b)
-
-      // 
-      // Player Projectile Shooting
-      // 
-      if (!this.gameEnded) {
-
-        var projectile = new Projectile(this, this.ship.x, this.ship.y, "playerproj", projX, projY, 100)
+  
+      const numProjectiles = this.playerprojnum || 1;
+      const offset = 20; 
+  
+      for (let i = 0; i < numProjectiles; i++) {
+        // Determine dominant direction
+        let offsetX = 0;
+        let offsetY = 0;
+        if (Math.abs(projX) > Math.abs(projY)) {
+          // More horizontal aiming, offset along y-axis
+          offsetY = i * offset - ((numProjectiles - 1) * offset) / 2;
+        } else {
+          // More vertical aiming, offset along x-axis
+          offsetX = i * offset - ((numProjectiles - 1) * offset) / 2;
+        }
+  
+        var projectile = new Projectile(this, this.ship.x + offsetX, this.ship.y + offsetY, "playerproj", projX, projY, 100);
         projectile.setDepth(2);
         this.projectiles.add(projectile);
       }
-    }, this);
-
+    }
   }
 
-  shootAt(){
+  shootCone(){
+    if (!this.gameEnded) {
+      const screenX = this.pointer.x;
+      const screenY = this.pointer.y;
+      const playerX = this.ship.x;
+      const playerY = this.ship.y;
+  
+      const worldX = playerX + (screenX - this.cameras.main.centerX);
+      const worldY = playerY + (screenY - this.cameras.main.centerY);
+  
+      let dirX = worldX - this.ship.x;
+      let dirY = worldY - this.ship.y;
+      let normalized = Math.sqrt(dirX * dirX + dirY * dirY);
+  
+      const projX = dirX / normalized;
+      const projY = dirY / normalized;
+  
+    
+      const spreadAngle = Math.PI / 12; // 15 degrees in radians for spread
+      const baseAngle = Math.atan2(projY, projX);
+      const angles = [-spreadAngle, 0, spreadAngle];
 
+      for (let i = 0; i < 3; i++) {
+        const angle = baseAngle + angles[i];
+        const projXOffset = Math.cos(angle);
+        const projYOffset = Math.sin(angle);
+
+        var projectile = new Projectile(this, this.ship.x, this.ship.y, "playerproj", projXOffset, projYOffset, 100);
+        projectile.setDepth(2);
+        this.projectiles.add(projectile);
+      }
+    }
   }
-
-
+  updateShootingDelay(newDelay) {
+    this.shootingDelay = newDelay;
+    if (this.shootingEvent) {
+      this.shootingEvent.remove();
+      this.startShooting();
+    }
+  }
 
   increaseScore() {
     this.score += 1;
@@ -230,14 +287,31 @@ class SceneMain extends Phaser.Scene {
     projectile.deactivate();
     if (!this.gameEnded) {
 
-
+      this.flasheffect();
       let vel = this.ship.body.velocity;
       if (!this.gameEnded) {
         player.setVelocityX(-vel.x * 1.25)
         player.setVelocityY(-vel.y * 1.25)
       }
     }
+  }
 
+  flasheffect(){
+    const flashDuration = 100; // Duration of each flash (in ms)
+    const repeatCount = 3; // Number of times to flash
+
+    this.tweens.add({
+        targets: this.ship,
+        alpha: 0, // Set transparency to 0 to create flash effect
+        ease: 'Cubic.easeOut',
+        duration: flashDuration,
+        repeat: repeatCount,
+        yoyo: true, // Return to original state after each flash
+        onComplete: () => {
+            this.ship.clearTint(); // Clear any tint applied
+            this.ship.setAlpha(1); // Ensure alpha is reset to 1
+        }
+    });
   }
 
   findClosestWaterTile(posX, posY) {
@@ -285,11 +359,11 @@ class SceneMain extends Phaser.Scene {
       sound.play()
     } else {
       this.setBarPercentage(this.healthBar, 0)
-      let sound = this.sound.add('playerdmg');
+      let sound = this.sound.add('gameover');
       sound.setLoop(false)
-      sound.setVolume(0.1)
-      sound.setDetune(Phaser.Math.Between(-400, 10))
+      sound.setVolume(0.7)
       sound.play()
+      
       this.gameOver();
     }
 
@@ -299,6 +373,8 @@ class SceneMain extends Phaser.Scene {
     this.ship.destroy();
     this.gameEnded = true;
     this.gameOverText.setVisible(true)
+   
+
   }
 
   handleProjectileProjectileCollision(playerProjectile, enemyProjectile) {
@@ -355,8 +431,18 @@ class SceneMain extends Phaser.Scene {
       }
       type = 1;
     }
-    if(this.maxEnemies > 60){
-      if(Math.random() > 0.65){
+    if(this.score > 30){
+      if(Math.random() < 0.1){
+        type = 2;
+      }
+    }
+    if(this.score > 50){
+      if(Math.random() < 0.2){
+        type = 2;
+      }
+    }
+    if(this.score > 80){
+      if(Math.random() < 0.4){
         type = 2;
       }
     }
@@ -368,12 +454,13 @@ class SceneMain extends Phaser.Scene {
     var texture = 'enemy';
     var hp = 3;
     var spawner = false;
-
+    var speed = 20;
     switch(type){
 
       case 0:
         texture = 'enemysmall';
         hp = 2;
+        speed = 25;
         break;
       case 1:
         texture = 'enemy';
@@ -383,18 +470,24 @@ class SceneMain extends Phaser.Scene {
         texture = 'enemybig';
         spawner = true;
         hp = 8;
+        speed = 15;
         break;
     }
 
-    console.log(hp,spawner)
     if (this.enemiecount < this.maxEnemies) {
-      let enemy = new Enemy(this, x, y, texture, this.ship, hp, spawner);
+      let enemy = new Enemy(this, x, y, texture, this.ship, hp, spawner,speed);
       this.enemies.add(enemy);
 
       enemy.setDepth(1);
       this.enemiecount++;
-      console.log("Enemies:" + this.enemiecount)
     };
+  }
+
+  spawnBoatEnemy(x,y){
+    let enemy = new Enemy(this, x, y, 'enemysmall', this.ship, 2, false,30,true);
+    this.enemies.add(enemy);
+    enemy.setDepth(2);
+
   }
 
 
@@ -418,7 +511,7 @@ class SceneMain extends Phaser.Scene {
 
   update() {
 
-    console.log(this.enemiecount)
+    console.log(this.enemiecount , this.maxEnemies)
     var snappedChunkX = (this.chunkSize * this.tileSize) * Math.round(this.ship.x / (this.chunkSize * this.tileSize));
     var snappedChunkY = (this.chunkSize * this.tileSize) * Math.round(this.ship.y / (this.chunkSize * this.tileSize));
 

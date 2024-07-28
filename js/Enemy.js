@@ -1,8 +1,9 @@
 
 class Enemy extends Phaser.Physics.Arcade.Sprite {
 
-  constructor(scene, x, y, texture, player, hp , spawner) {
+  constructor(scene, x, y, texture, player, hp , spawner, speed, dontgiveScore) {
     super(scene, x, y, texture);
+    this.scene = scene;
     this.player = player;
     this.freeze = false;
     this.accepted = false;
@@ -26,11 +27,20 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     var newxy = this.scene.findClosestWaterTile(this.x,this.y)
     var vectorD = new Phaser.Math.Vector2(newxy.x - this.x,newxy.y - this.y);
     vectorD.normalize()
-    this.x = this.x  + vectorD.x*64
-    this.y = this.y +  vectorD.y*64   
+    if(dontgiveScore != null || dontgiveScore != false){
+      this.x = this.x  + vectorD.x*64
+      this.y = this.y +  vectorD.y*64   
+    }
+    
     
     let vec = new Phaser.Math.Vector2(dirX, dirY)
 
+    if(dontgiveScore){
+      this.givesscore = false;
+    } else{
+      this.givesscore = true;
+    }
+    
 
 
     //console.log(this.player.x)
@@ -56,8 +66,11 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.texture = texture
     this.setDepth(1);
     this.attackspeed = 100;
+    
     this.speed = 20;
-
+    if(speed){
+      this.speed = speed;
+    }
     this.rand = Math.random() * 1000
     this.scene.time.addEvent({
 
@@ -69,19 +82,40 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
     if(spawner){
       this.scene.time.addEvent({
-        delay: 10000,
+        delay: 5000,
         callback : this.spawnboats,
         callbackScope: this,
         loop:true
       })
     }
+    this.playSpawnSound();
+  }
 
+  playSpawnSound(){
+    let sound = this.scene.sound.add('spawn');
+    sound.setVolume(0.1);
+    sound.setLoop(false);
+    
+    if(!this.givesscore){
+      sound.setDetune(Phaser.Math.Between(100, 300))
+    } else {
+      sound.setDetune(Phaser.Math.Between(-100, 100))
+    }
+    sound.play();
   }
   checkTile() {
     var chunk = this.scene.getChunkAtPos(this.x, this.y);
     if (chunk.getTileAtWorldPosition(this.x, this.y) === 'sprWater') {
       return true;
     }
+  }
+
+  spawnboats(){
+    if (this.scene) {
+      this.scene.spawnBoatEnemy(this.x, this.y);
+  } else {
+      console.error('Scene reference is missing.');
+  }
   }
 
   makeBar(x, y, color) {
@@ -105,7 +139,9 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   die() {
     console.log("Died")
-    this.scene.enemiecount--;
+    if(this.givesscore){
+      this.scene.enemiecount--;
+    }
     this.isdead = true;
     if (this.body) {
       this.body.setEnable(false); // Disable physics body
@@ -149,11 +185,40 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
   }
 
+  flasheffect(){
+    const flashDuration = 150; // Duration of each flash (in ms)
+        const repeatCount = 0; // Number of times to flash
+
+        this.scene.tweens.addCounter({
+          from: 0,
+          to: 1,
+          duration: flashDuration,
+          repeat: repeatCount,
+          yoyo: true,
+          onUpdate: (tween) => {
+              const value = tween.getValue();
+              const tint = Phaser.Display.Color.Interpolate.ColorWithColor(
+                  { r: 255, g: 255, b: 255 },
+                  { r: 255, g: 0, b: 0 }, 
+                 
+                  1,
+                  value
+              );
+              this.setTint(Phaser.Display.Color.GetColor(tint.r, tint.g, tint.b));
+          },
+          onComplete: () => {
+              this.clearTint(); // Clear the tint after the tween completes
+          }
+      });
+    }
+  
+
   takeDamage() {
     this.health -= 1;
+    this.flasheffect()
     if (this.health <= 0) {
       // play death anim () function
-      if (this.scene) {
+      if (this.scene && this.givesscore) {
         this.scene.increaseScore();
       }
       

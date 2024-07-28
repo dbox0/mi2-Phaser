@@ -1,7 +1,7 @@
 
 
 class Projectile extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, x, y, texture, dirX, dirY, speed, enemy, lifetime,mute) {
+  constructor(scene, x, y, texture, dirX, dirY, speed, enemy, lifetime,mute , rotationSpeed) {
     super(scene, x, y, texture);
     this.speed = speed;
     this.scene = scene;

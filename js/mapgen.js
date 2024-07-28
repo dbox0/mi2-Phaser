@@ -103,6 +103,7 @@ class Chunk {
 class Tile extends Phaser.GameObjects.Sprite {
   constructor(scene, x, y, key, water, keyframe, spawner, player) {
     super(scene, x, y, key);
+    this.scene = scene
     this.key = key;
     this.water = water;
     this.scene = scene;
@@ -117,16 +118,29 @@ class Tile extends Phaser.GameObjects.Sprite {
     if(spawner){
     this.scene.time.addEvent(
       {
-        delay: 1000,
-        callback: this.spawn(this.scene),
-        callbackscope: this,
+        delay: 10000,
+        callback: this.spawn,
+        callbackScope: this,
         loop: true,
       }
     )
+    this.scene.time.addEvent(
+      {
+        delay: 100,
+        callback: this.spawn,
+        callbackScope: this,
+        loop: false,
+      }
+    )
   }
-  }
-  spawn(scene) {
-      scene.spawnEnemyAt(this.x, this.y)
+}
+ 
+  spawn() {
+    if(this.scene){
+      this.scene.spawnEnemyAt(this.x, this.y)}
+      else {
+        console.error("Cant find scene to spawn enemy on tile")
+      }
   }
 
 
