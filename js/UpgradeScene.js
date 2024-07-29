@@ -19,7 +19,8 @@ class UpgradeScene extends Phaser.Scene {
             { text: 'Faster Cannons', effect: this.increaseSpeed },
             { text: 'Repair Ship', effect: this.increaseHealth },
             { text: '+1 Cannons', effect: this.increaseDamage },
-            { text: 'Add Triple Cannon', effect: this.tripleUpgrade }
+            { text: 'Add Triple Cannon', effect: this.tripleUpgrade }, 
+            { text: '+3% Movement speed', effect: this.movspeed  }
         ];
 
         const availableUpgrades = this.upgradeOptions.filter((option, index) => 
@@ -34,7 +35,7 @@ class UpgradeScene extends Phaser.Scene {
         // Create text with smaller font size
         let buttonText = this.add.text(0, 0, option.text, { fontSize: '18px', fill: '#fff' }).setOrigin(0.5);
         
-        let container = this.add.container(350, 200 + i * 100, [button, buttonText])
+        let container = this.add.container(350, 100 + i * 100, [button, buttonText])
             .setAlpha(0)
             .setScale(0)
             .setSize(button.width, button.height)
@@ -51,6 +52,14 @@ class UpgradeScene extends Phaser.Scene {
             ease: 'Power2',
             delay: i * 200
         });
+    }
+}
+
+movspeed(){
+    if(!this.chosen){
+        let mainscene = this.scene.get('SceneMain');
+        mainscene.upgradespeed();
+        this.chosen = true;
     }
 }
 

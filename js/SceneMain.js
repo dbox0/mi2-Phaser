@@ -11,6 +11,7 @@ class SceneMain extends Phaser.Scene {
     this.attackSpeedUpgrades = 0;
     this.shootingTriples = false;
     this.upgradeQueued = false;
+    this.maxmovspeed = 20;
   }
 
   preload() {
@@ -86,7 +87,7 @@ class SceneMain extends Phaser.Scene {
     this.enemiecount = 0;
     this.startingenemies = 7;
     this.maxEnemies = this.startingenemies;
-    this.gameOverText = this.add.text(16, 16, 'GAME OVER', { fontSize: '32px', fill: '#f00' });
+    this.gameOverText = this.add.text(16, 16, '\t\t\t\tGAME OVER\nPress \'R\' to restart', { fontSize: '32px', fill: '#f00' });
     this.gameOverText.setDepth(3);
     this.gameOverText.setVisible(false)
     this.gameEnded = false;
@@ -152,7 +153,7 @@ class SceneMain extends Phaser.Scene {
     this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
     this.keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
     this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
-    this.keyP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
+    this.keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
 
     // player init
     this.ship = this.physics.add.sprite(this.cameras.main.worldView.x, this.cameras.main.worldView.y, 'ship');
@@ -372,7 +373,8 @@ class SceneMain extends Phaser.Scene {
     const upgradeInterval = Math.ceil(baseInterval * Math.pow(scalingFactor, this.score / 100));
 
     // Check if the score is at an upgrade point
-    if (this.score % (upgradeInterval-1) === 0 && this.score > 1) {
+    //(upgradeInterval-1)
+    if (this.score % 1 === 0 && this.score > 1) {
         this.showUpgradeChoice();
     }
     
@@ -461,6 +463,18 @@ class SceneMain extends Phaser.Scene {
     //let proj = new Projectile(this,closestWaterTile.x,closestWaterTile.y,"a",0,0,0,false,100,true);
     return closestWaterTile
   }
+
+  hitroutine(){ this.time.addEvent({
+    delay: 2000,
+    callback: this.resetspeed,
+    callbackScope: this,
+    loop: false
+  });
+  }
+
+  resetspeed(){
+    this.movspeed = this.maxmovspeed;
+  }
   playerTakeDamage() {
     //console.log("OUCH WATCH WHERE YER SAILIN ARRRR")
     this.health -= 1;
@@ -472,6 +486,8 @@ class SceneMain extends Phaser.Scene {
       sound.setVolume(0.1)
       sound.setDetune(Phaser.Math.Between(-700, 10))
       sound.play()
+      this.movspeed = 40
+      this.hitroutine()
     } else {
       this.setBarPercentage(this.healthBar, 0)
       let sound = this.sound.add('gameover');
@@ -481,6 +497,7 @@ class SceneMain extends Phaser.Scene {
       
       this.gameOver();
     }
+    
 
   }
 
@@ -609,10 +626,16 @@ class SceneMain extends Phaser.Scene {
 
   spawnBoatEnemy(x,y,parent){
     if(parent.getNumSpawned() < 5){
-      let enemy = new Enemy(this, x, y, 'enemysmall', this.ship, 2, false,30,true,1,0,parent);
+      let enemy = new Enemy(this, x, y, 'enemysmall', this.ship, 2, false,33,true,1,0,parent);
       this.enemies.add(enemy);
       return true;
     } return false;
+  }
+
+  restart(){
+    if(this.gameEnded){
+      this.scene.restart();
+    }
   }
 
 
@@ -633,7 +656,10 @@ class SceneMain extends Phaser.Scene {
     return returnchunk
   }
 
-
+  upgradespeed(){
+    this.maxmovspeed *= 1.03;
+    this.movspeed = this.maxmovspeed;
+  }
   update() {
 
     console.log(this.enemiecount , this.maxEnemies)
@@ -675,11 +701,14 @@ class SceneMain extends Phaser.Scene {
       }
     }
 
+   
 
+    if(this.keyR.isDown){
+      this.restart();
+    }
     if (!this.gameEnded) {
-     if(this.keyP.isDown){
-     return
-     }
+     
+      
       if (this.keyW.isDown) {
         this.ship.y -= 0.2;
         this.ship.setVelocityY(-this.movspeed);
@@ -729,7 +758,7 @@ class SceneMain extends Phaser.Scene {
     }
     this.scoreText.y = this.ship.y - 200
     this.scoreText.x = this.ship.x + 55
-    this.gameOverText.x = this.ship.x - 50
+    this.gameOverText.x = this.ship.x - 200
     this.gameOverText.y = this.ship.y
     this.cameras.main.centerOn(this.ship.x, this.ship.y);
   }
