@@ -7,27 +7,29 @@ class Projectile extends Phaser.Physics.Arcade.Sprite {
     this.scene = scene;
     this.scene.physics.world.enable(this);
     this.scene.add.existing(this);
-    this.dirX = dirX;
-    this.dirY = dirY;
+    
+    this.dir = [dirX, dirY]
     this.speed = speed;
     this.lifespan = 2000;
-    this.setDepth(2);
-
-    this.enemy = enemy;
+    
+    
     this.setActive(false);
     this.setVisible(false);
     this.setDepth(1);
 
+    this.enemy = enemy;   // is this an enemy projectile?
     if (!enemy) {
       this.lifespan += 100;
     }
+
+    // Overwritten lifetime?
     if (lifetime) {
       this.lifespan = lifetime
     }
 
     // console.log("pew L" + this.dirX, + " " + this.dirY);
 
-
+    //Sound 
     if(!mute){
     if (enemy) {
       let sound = this.scene.sound.add('shot');
@@ -46,24 +48,13 @@ class Projectile extends Phaser.Physics.Arcade.Sprite {
     }
 
 
-
     this.setDepth(1);
     this.setActive(true);
     this.setVisible(true);
 
-    //console.log(a)
-    //console.log(b)
-    this.dir = [dirX, dirY]
-
+   
     // Normalize directional vector
     this.magnitude = Math.sqrt((this.dir[0] * this.dir[0] + this.dir[1] * this.dir[1]))
-    // console.log("Magnitude " + magnitude)
-    //this.dir[0] = this.dirX/this.magnitude;
-    //this.dir[1] = this.dirY/this.magnitude;
-    //console.log(this.dir[0] + ": " + this.dir[1])
-
-
-    //console.log("Projectile : " + this.dir[0] + ": " + this.dir[1] +" "+ magnitude)
 
 
     this.scene.time.addEvent({
@@ -74,14 +65,12 @@ class Projectile extends Phaser.Physics.Arcade.Sprite {
 
   }
 
-
   deactivate() {
     this.setActive(false);
     this.setVisible(false);
     //this.body.stop();
     this.destroy();
   }
-
   update() {
     this.setVelocity(this.dir[0] / this.magnitude * this.speed, this.dir[1] / this.magnitude * this.speed);
   }

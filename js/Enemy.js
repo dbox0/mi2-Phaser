@@ -1,13 +1,13 @@
 
 class Enemy extends Phaser.Physics.Arcade.Sprite {
 
-  constructor(scene, x, y, texture, player, hp , spawner, speed, dontgiveScore) {
+  constructor(scene, x, y, texture, player, hp , spawner, speed, dontgiveScore,attacktype , rangebonus) {
     super(scene, x, y, texture);
     this.scene = scene;
     this.player = player;
     this.freeze = false;
     this.accepted = false;
-
+    this.attacktype = attacktype;
 
     scene.physics.world.enable(this);
     this.scene.add.existing(this);
@@ -20,20 +20,16 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     let vectory = dirY / magnitude
 
 
-    this.x += vectorx * 128
-    this.y += vectory * 128
-
 
     var newxy = this.scene.findClosestWaterTile(this.x,this.y)
     var vectorD = new Phaser.Math.Vector2(newxy.x - this.x,newxy.y - this.y);
     vectorD.normalize()
     if(dontgiveScore != null || dontgiveScore != false){
-      this.x = this.x  + vectorD.x*64
-      this.y = this.y +  vectorD.y*64   
+      
+    
+    this.x = this.x  + vectorD.x*64
+    this.y = this.y +  vectorD.y*64   
     }
-    
-    
-    let vec = new Phaser.Math.Vector2(dirX, dirY)
 
     if(dontgiveScore){
       this.givesscore = false;
@@ -65,19 +61,23 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.scene = scene;
     this.texture = texture
     this.setDepth(1);
-    this.attackspeed = 100;
+    this.rangebonus = 0;
+    if(rangebonus){
+      this.rangebonus = rangebonus
+    }
+    this.attackspeed = 100 + this.rangebonus;
     
     this.speed = 20;
     if(speed){
       this.speed = speed;
     }
-    this.rand = Math.random() * 1000
+
     this.scene.time.addEvent({
 
-      delay: (this.firerate + this.rand),
-      callback: this.fireProjectile,
+      delay: 1000,
+      callback: this.startFiring,
       callbackScope: this,
-      loop: true
+      loop: false
     });
 
     if(spawner){
@@ -91,6 +91,20 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.playSpawnSound();
   }
 
+  startFiring(){
+    
+    var rand = Math.random() * 800
+    if(this.scene){
+      this.scene.time.addEvent({
+
+        delay: (this.firerate + rand),
+        callback: this.fireProjectile,
+        callbackScope: this,
+        loop: true
+      });
+    }
+   
+  }
   playSpawnSound(){
     let sound = this.scene.sound.add('spawn');
     sound.setVolume(0.1);
@@ -111,12 +125,15 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
   }
 
   spawnboats(){
+  if(!this.isdead){
     if (this.scene) {
       this.scene.spawnBoatEnemy(this.x, this.y);
   } else {
       console.error('Scene reference is missing.');
   }
   }
+  }
+
 
   makeBar(x, y, color) {
     //draw the bar
@@ -164,7 +181,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
       //console.log(this.player);
    
       //console.log(this.player.y - this.y)
-
+      
       let distanceVector = [this.x - this.player.x, this.y - this.player.y];
       const distance = Math.sqrt(distanceVector[0] * distanceVector[0] + distanceVector[1] * distanceVector[1])
       if (distance < 300) {
@@ -173,12 +190,40 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         if(Math.random() > 0.6){
           invert = -1;
         }
-        var dirx =  (this.player.x + this.player.body.velocity.x *invert* predictionTime) - this.x;
-        var diry = (this.player.y + this.player.body.velocity.y *invert* predictionTime) - this.y;
-        var projectile = new Projectile(this.scene, this.x, this.y, "projectile", dirx, diry, this.attackspeed, true)
+        var dirX =  (this.player.x + this.player.body.velocity.x *invert* predictionTime) - this.x;
+        var dirY = (this.player.y + this.player.body.velocity.y *invert* predictionTime) - this.y;
+        var normalized = Math.sqrt(dirX * dirX + dirY * dirY);
+        if(!this.attacktype){
+        var projectile = new Projectile(this.scene, this.x, this.y, "projectile", dirX, dirY, this.attackspeed, true)
         this.scene.enemyprojectiles.add(projectile);
-        projectile.setDepth(1);
+        projectile.setDepth(1); 
+        return;
+        }
+       
+  
+        const projX = dirX / normalized;
+        const projY = dirY / normalized;
+        const numProjectiles = this.attacktype;
+        const offset = 20; 
+        for (let i = 0; i < numProjectiles; i++) {
+          // Determine dominant aiming direction
+          let offsetX = 0;
+          let offsetY = 0;
+          if (Math.abs(projX) > Math.abs(projY)) {
+            // More horizontal aiming, offset along y-axis
+            offsetY = i * offset - ((numProjectiles - 1) * offset) / 2;
+          } else {
+            // More vertical aiming, offset along x-axis
+            offsetX = i * offset - ((numProjectiles - 1) * offset) / 2;
+          }
 
+          var spawnoffset = 1;
+          var projectile = new Projectile(this.scene, this.x + offsetX
+            + Math.random() * spawnoffset, this.y + offsetY + Math.random() * spawnoffset, "projectile", projX, projY, this.attackspeed,true);
+          
+          this.scene.enemyprojectiles.add(projectile);
+          projectile.setDepth(1); 
+          }
       }
     }
 
@@ -238,8 +283,6 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
 
 
   handleCollision(velocityNormalized , depth) {
-
-
     let offsets = [0, 16, 32, 64,128]
     let iterateTo = -1
     if(depth){
@@ -279,7 +322,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
       let dirY = this.player.y - this.y
       let distanceToPlayer = Math.sqrt(dirX * dirX + dirY * dirY);
 
-      if ( distanceToPlayer < 200) {
+      if ( distanceToPlayer < 200 && this.givesscore) {
         this.accepted = false;
         this.tested = true
         this.die();

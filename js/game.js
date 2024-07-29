@@ -15,6 +15,7 @@ var config = {
       MenueScene,
       SceneMain,
       HowToPlay,
+      UpgradeScene,
 
     ],
     pixelArt: true,
