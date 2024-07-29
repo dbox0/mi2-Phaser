@@ -8,6 +8,7 @@ class SceneMain extends Phaser.Scene {
     this.shootingEvent = null;
     this.movspeed = 20;
     this.delays = [1000,2000,3500];
+    this.attackSpeedUpgrades = 0;
   }
 
   preload() {
@@ -288,20 +289,24 @@ class SceneMain extends Phaser.Scene {
   }
 
 
-  updateShootingDelay(percentage,index) {
-    var sindex = 0;
-    if(index){
-      sindex = index;
-    }
-    console.log(this.shootingDelay);
-    if(percentage){
-      this.delays[sindex] *= percentage;
-    } 
-  
-    console.log(this.shootingDelay);
+  updateShootingDelay() {
+
+    console.log('Before:', this.shootingDelay);
+
+    // Calculate the multiplier using exponential decay
+    const baseMultiplier = 0.8; // Base multiplier for the first upgrade
+    const decayRate = 0.9; // Decay rate to reduce the effect of each subsequent upgrade
+
+    // Apply diminishing returns
+    const multiplier = Math.pow(baseMultiplier, Math.pow(decayRate, this.attackSpeedUpgrades));
+    this.shootingDelay *= multiplier;
+    this.attackSpeedUpgrades++; // Increment the counter
+
+    console.log('After:', this.shootingDelay);
+
     if (this.shootingEvent) {
-      this.shootingEvent.remove();
-      this.startShootingRoutine();
+        this.shootingEvent.remove();
+        this.startShootingRoutine();
     }
   }
 

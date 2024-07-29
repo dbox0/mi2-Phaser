@@ -15,7 +15,7 @@ class UpgradeScene extends Phaser.Scene {
 
         // Create upgrade options
         this.upgradeOptions = [
-            { text: '20% faster Cannons', effect: this.increaseSpeed },
+            { text: 'Faster Cannons', effect: this.increaseSpeed },
             { text: 'Repair Ship', effect: this.increaseHealth },
             { text: '+1 Cannons', effect: this.increaseDamage }
         ];
@@ -65,7 +65,7 @@ applyUpgrade(effect, upgradeText) {
 increaseSpeed() {
     if (!this.chosen) {
         let mainscene = this.scene.get('SceneMain');
-        mainscene.updateShootingDelay(0.80);
+        mainscene.updateShootingDelay();
         this.chosen = true;
     }
 }

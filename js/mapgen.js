@@ -113,9 +113,6 @@ class Chunk {
       this.isLoaded = true;
     }
   }
-
-
-
 }
 
 
