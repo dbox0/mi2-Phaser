@@ -374,7 +374,7 @@ class SceneMain extends Phaser.Scene {
 
     // Check if the score is at an upgrade point
     //
-    if (this.score % 1 === (upgradeInterval-1) && this.score > 1) {
+    if (this.score % (upgradeInterval-1) === 0 && this.score > 1) {
         this.showUpgradeChoice();
     }
     
