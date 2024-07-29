@@ -282,9 +282,21 @@ getNumSpawned(){
         this.scene.increaseScore();
       }
       
+      let sound = this.scene.sound.add('hit');
+      sound.setVolume(0.3);
+      sound.setDetune(Phaser.Math.Between(-500, -300))
+    
+      sound.setLoop(false);
+      sound.play()
+      
       this.die()
 
     } else {
+      let sound = this.scene.sound.add('hit');
+      sound.setDetune(Phaser.Math.Between(200, 300))
+      sound.setVolume(0.3);
+      sound.setLoop(false);
+      sound.play()
       let percentage = this.health/this.maxhealth
       this.setBarValue(this.healthBar, percentage*100)
     }

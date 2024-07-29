@@ -36,6 +36,7 @@ class SceneMain extends Phaser.Scene {
     this.load.audio('playerdmg', 'content/sounds/ownshipdemage.mp3');
     this.load.audio('spawn','content/sounds/spawn.wav');
     this.load.audio('gameover','content/sounds/gameover.mp3')
+    this.load.audio('hit','content/sounds/hurt.mp3')
 
 
   }
@@ -344,11 +345,9 @@ class SceneMain extends Phaser.Scene {
   upgradeShootingDelay() {
 
     console.log('Before:', this.shootingDelay);
-
     // Calculate the multiplier using exponential decay
     const baseMultiplier = 0.8; // Base multiplier for the first upgrade
     const decayRate = 0.95; // Decay rate to reduce the effect of each subsequent upgrade
-
     // Apply diminishing returns
     const multiplier = Math.pow(baseMultiplier, Math.pow(decayRate, this.attackSpeedUpgrades));
     this.shootingDelay *= multiplier;
@@ -546,9 +545,6 @@ class SceneMain extends Phaser.Scene {
   spawnEnemyAt(x,y){
     var type = 0;
     if(this.maxEnemies >= 25 || this.score > 20){
-      if(Math.random() > 0.25){
-        type = 2;
-      }
       type = 1;
     }
     if(this.score > 30){

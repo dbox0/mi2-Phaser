@@ -23,15 +23,11 @@ class Chunk {
 
   getTileAtWorldPosition(worldX, worldY) {
     // Calculate local tile coordinates
-    //console.log(this.x,this.y)
     const chunkOffsetX = this.x * this.scene.chunkSize * this.scene.tileSize;
     const chunkOffsetY = this.y * this.scene.chunkSize * this.scene.tileSize;
     const localX = Math.floor((worldX - (this.x * this.scene.chunkSize * this.scene.tileSize)) / this.scene.tileSize);
     const localY = Math.floor((worldY - (this.y * this.scene.chunkSize * this.scene.tileSize)) / this.scene.tileSize)
-
-
-
-    // console.log(worldX,worldY,localX,localY, "BLAS");
+    
     // Check if the local coordinates are within the chunk
     let tile = null;
 
