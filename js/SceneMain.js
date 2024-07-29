@@ -9,6 +9,8 @@ class SceneMain extends Phaser.Scene {
     this.movspeed = 20;
     this.delays = [1000,2000,3500];
     this.attackSpeedUpgrades = 0;
+    this.shootingTriples = false;
+    this.upgradeQueued = false;
   }
 
   preload() {
@@ -197,17 +199,27 @@ class SceneMain extends Phaser.Scene {
 
   startDoubleShootRoutine(){
     if(!this.startedDouble){
-      this.doubleshootevent = this.time.addEvent({
-        delay: this.delays[1],
-        callback: this.shootCone,
-        callbackScope: this,
-        loop:true
-      });
-      this.startedDouble = true;
+      if(!this.startedDouble){
+        this.doubleshootevent = this.time.addEvent({
+          delay: this.delays[1],
+          callback: this.shootCone,
+          callbackScope: this,
+          loop:true
+        });
+        this.startedDouble = true;
+      }
+    } else {
+      this.upgradeQueued = true;
     }
-   
   }
-
+  startExtraDoubleShootRoutine(){
+    this.doubleshootevent = this.time.addEvent({
+      delay: this.delays[1],
+      callback: this.shootCone,
+      callbackScope: this,
+      loop:true
+  });
+}
   shoot() {
     if (!this.gameEnded) {
       const screenX = this.pointer.x;
@@ -226,27 +238,51 @@ class SceneMain extends Phaser.Scene {
       const projY = dirY / normalized;
   
       const numProjectiles = this.playerprojnum || 1;
+      
       const offset = 20; 
 
       const spawnoffset = 0;
-  
-      for (let i = 0; i < numProjectiles; i++) {
-        // Determine dominant aiming direction
-        let offsetX = 0;
-        let offsetY = 0;
-        if (Math.abs(projX) > Math.abs(projY)) {
-          // More horizontal aiming, offset along y-axis
-          offsetY = i * offset - ((numProjectiles - 1) * offset) / 2;
-        } else {
-          // More vertical aiming, offset along x-axis
-          offsetX = i * offset - ((numProjectiles - 1) * offset) / 2;
+      if(numProjectiles/3 >= 1){
+        console.log("A")
+        var rest = numProjectiles - 3;
+        this.shootCone();
+        for (let i = 0; i < rest; i++) {
+          // Determine dominant aiming direction
+          let offsetX = 0;
+          let offsetY = 0;
+          if (Math.abs(projX) > Math.abs(projY)) {
+            // More horizontal aiming, offset along y-axis
+            offsetY = i * offset - ((numProjectiles - 1) * offset) / 2;
+          } else {
+            // More vertical aiming, offset along x-axis
+            offsetX = i * offset - ((numProjectiles - 1) * offset) / 2;
+          }
+    
+          var projectile = new Projectile(this, this.ship.x + offsetX
+            + Math.random() * spawnoffset, this.ship.y + offsetY + Math.random() * spawnoffset, "playerproj", projX, projY, 100);
+          projectile.setDepth(2);
+          this.projectiles.add(projectile);
         }
-  
-        var projectile = new Projectile(this, this.ship.x + offsetX
-          + Math.random() * spawnoffset, this.ship.y + offsetY + Math.random() * spawnoffset, "playerproj", projX, projY, 100);
-        projectile.setDepth(2);
-        this.projectiles.add(projectile);
+      } else {
+        for (let i = 0; i < numProjectiles; i++) {
+          // Determine dominant aiming direction
+          let offsetX = 0;
+          let offsetY = 0;
+          if (Math.abs(projX) > Math.abs(projY)) {
+            // More horizontal aiming, offset along y-axis
+            offsetY = i * offset - ((numProjectiles - 1) * offset) / 2;
+          } else {
+            // More vertical aiming, offset along x-axis
+            offsetX = i * offset - ((numProjectiles - 1) * offset) / 2;
+          }
+    
+          var projectile = new Projectile(this, this.ship.x + offsetX
+            + Math.random() * spawnoffset, this.ship.y + offsetY + Math.random() * spawnoffset, "playerproj", projX, projY, 100);
+          projectile.setDepth(2);
+          this.projectiles.add(projectile);
+        }
       }
+      
     }
   }
 
@@ -282,20 +318,36 @@ class SceneMain extends Phaser.Scene {
         this.projectiles.add(projectile);
       }
     }
+    if(this.upgradeQueued){
+      this.time.addEvent({
+
+        delay: 500,
+        callback: this.startExtraDoubleShootRoutine,
+        callbackScope: this,
+        loop: false
+      });
+      this.upgradeQueued = false;
+    }
   }
 
-  shootTriangle(){
 
+  heal(){
+    this.flasheffect();
+    this.health = Math.min(5,this.health + 2);
+    this.setBarPercentage(this.healthBar, this.health / this.maxhealth * 100)
+   
   }
 
-
-  updateShootingDelay() {
+  updateShootingDelay(){
+    this.upgradeShootingDelay();
+  }
+  upgradeShootingDelay() {
 
     console.log('Before:', this.shootingDelay);
 
     // Calculate the multiplier using exponential decay
     const baseMultiplier = 0.8; // Base multiplier for the first upgrade
-    const decayRate = 0.9; // Decay rate to reduce the effect of each subsequent upgrade
+    const decayRate = 0.95; // Decay rate to reduce the effect of each subsequent upgrade
 
     // Apply diminishing returns
     const multiplier = Math.pow(baseMultiplier, Math.pow(decayRate, this.attackSpeedUpgrades));
@@ -321,7 +373,7 @@ class SceneMain extends Phaser.Scene {
     const upgradeInterval = Math.ceil(baseInterval * Math.pow(scalingFactor, this.score / 100));
 
     // Check if the score is at an upgrade point
-    if (this.score % (upgradeInterval - 1) === 0 && this.score > 1) {
+    if (this.score % (upgradeInterval-1) === 0 && this.score > 1) {
         this.showUpgradeChoice();
     }
     
@@ -332,9 +384,10 @@ class SceneMain extends Phaser.Scene {
 
   showUpgradeChoice() {
     // Show the upgrade choice UI
+    if(!this.gameEnded){
     this.scene.pause();
     this.scene.launch('UpgradeScene');
-}
+}}
 
   printplayer() {
     //console.log(this.ship.x,this.ship.y)
@@ -432,6 +485,10 @@ class SceneMain extends Phaser.Scene {
 
   }
 
+  increaseHealth(){
+    this.heal();
+  }
+
   gameOver() {
     this.ship.destroy();
     this.gameEnded = true;
@@ -441,7 +498,7 @@ class SceneMain extends Phaser.Scene {
   }
 
   handleProjectileProjectileCollision(playerProjectile, enemyProjectile) {
-    console.log("a")
+  
     enemyProjectile.deactivate();
 
 
@@ -514,6 +571,7 @@ class SceneMain extends Phaser.Scene {
 
  
   spawnEnemy(x, y,type) {
+   
  
     var texture = 'enemy';
     var hp = 3;
@@ -553,11 +611,12 @@ class SceneMain extends Phaser.Scene {
     };
   }
 
-  spawnBoatEnemy(x,y){
-    let enemy = new Enemy(this, x, y, 'enemysmall', this.ship, 2, false,30,true);
-    this.enemies.add(enemy);
-
-
+  spawnBoatEnemy(x,y,parent){
+    if(parent.getNumSpawned() < 5){
+      let enemy = new Enemy(this, x, y, 'enemysmall', this.ship, 2, false,30,true,1,0,parent);
+      this.enemies.add(enemy);
+      return true;
+    } return false;
   }
 
 
@@ -623,7 +682,7 @@ class SceneMain extends Phaser.Scene {
 
     if (!this.gameEnded) {
      if(this.keyP.isDown){
-      this.startDoubleShootRoutine();
+     return
      }
       if (this.keyW.isDown) {
         this.ship.y -= 0.2;

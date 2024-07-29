@@ -1,14 +1,17 @@
 
 class Enemy extends Phaser.Physics.Arcade.Sprite {
 
-  constructor(scene, x, y, texture, player, hp , spawner, speed, dontgiveScore,attacktype , rangebonus) {
+  constructor(scene, x, y, texture, player, hp , spawner, speed, dontgiveScore,attacktype , rangebonus,parent) {
     super(scene, x, y, texture);
     this.scene = scene;
+    if(parent){
+      this.parent = parent;
+    }
     this.player = player;
     this.freeze = false;
     this.accepted = false;
     this.attacktype = attacktype;
-
+    this.numspawned = 0;
     scene.physics.world.enable(this);
     this.scene.add.existing(this);
 
@@ -19,7 +22,9 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     let vectorx = dirX / magnitude;
     let vectory = dirY / magnitude
 
-
+    if(this.parent){
+      console.log(parent)
+    }
 
     var newxy = this.scene.findClosestWaterTile(this.x,this.y)
     var vectorD = new Phaser.Math.Vector2(newxy.x - this.x,newxy.y - this.y);
@@ -37,7 +42,6 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
       this.givesscore = true;
     }
     
-
 
     //console.log(this.player.x)
     //console.log(this.player.y)
@@ -91,6 +95,9 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.playSpawnSound();
   }
 
+  decrementSpawnedNum(){
+    this.numspawned--;
+  }
   startFiring(){
     
     var rand = Math.random() * 800
@@ -105,6 +112,10 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
    
   }
+getNumSpawned(){
+  return this.numspawned;
+}
+
   playSpawnSound(){
     let sound = this.scene.sound.add('spawn');
     sound.setVolume(0.1);
@@ -127,9 +138,11 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
   spawnboats(){
   if(!this.isdead){
     if (this.scene) {
-      this.scene.spawnBoatEnemy(this.x, this.y);
+      if(this.scene.spawnBoatEnemy(this.x, this.y,this)){
+          this.numspawned++;
+      }
   } else {
-      console.error('Scene reference is missing.');
+    return;
   }
   }
   }
@@ -158,6 +171,8 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
     console.log("Died")
     if(this.givesscore){
       this.scene.enemiecount--;
+    } else {
+      this.parent.decrementSpawnedNum();
     }
     this.isdead = true;
     if (this.body) {

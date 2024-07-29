@@ -155,7 +155,7 @@ class Tile extends Phaser.GameObjects.Sprite {
     if(this.scene){
       this.scene.spawnEnemyAt(this.x, this.y)}
       else {
-        console.error("Cant find scene to spawn enemy on tile")
+        return;
       }
   }
 

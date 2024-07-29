@@ -3,6 +3,7 @@ class UpgradeScene extends Phaser.Scene {
         super({ key: 'UpgradeScene' });
         this.chosen = false;
         this.takenUpgrades = new Set(); // Track taken upgrades
+        this.takenNum = 0;
     }
 
     preload(){
@@ -17,7 +18,8 @@ class UpgradeScene extends Phaser.Scene {
         this.upgradeOptions = [
             { text: 'Faster Cannons', effect: this.increaseSpeed },
             { text: 'Repair Ship', effect: this.increaseHealth },
-            { text: '+1 Cannons', effect: this.increaseDamage }
+            { text: '+1 Cannons', effect: this.increaseDamage },
+            { text: 'Add Triple Cannon', effect: this.tripleUpgrade }
         ];
 
         const availableUpgrades = this.upgradeOptions.filter((option, index) => 
@@ -32,7 +34,7 @@ class UpgradeScene extends Phaser.Scene {
         // Create text with smaller font size
         let buttonText = this.add.text(0, 0, option.text, { fontSize: '18px', fill: '#fff' }).setOrigin(0.5);
         
-        let container = this.add.container(400, 200 + i * 100, [button, buttonText])
+        let container = this.add.container(350, 200 + i * 100, [button, buttonText])
             .setAlpha(0)
             .setScale(0)
             .setSize(button.width, button.height)
@@ -54,12 +56,18 @@ class UpgradeScene extends Phaser.Scene {
 
 applyUpgrade(effect, upgradeText) {
     if (!this.chosen) {
+        
         effect.call(this);
         this.takenUpgrades.add(upgradeText); // Track taken upgrade
         this.scene.resume('SceneMain');
         this.chosen = false;
+        this.takenNum++;
+        if(this.takenNum > 0 && this.takenNum % 5 == 0){
+            this.takenUpgrades.clear()
+        }
         this.scene.stop();
     }
+   
 }
 
 increaseSpeed() {
@@ -82,6 +90,14 @@ increaseDamage() {
     if (!this.chosen) {
         let mainscene = this.scene.get('SceneMain');
         mainscene.incrementProjNum();
+        this.chosen = true;
+    }
+}
+tripleUpgrade(){
+   
+    if (!this.chosen) {
+        let mainscene = this.scene.get('SceneMain');
+        mainscene.startDoubleShootRoutine();
         this.chosen = true;
     }
 }
